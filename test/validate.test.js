@@ -51,3 +51,13 @@ test("device detection", () => {
   assert.equal(deviceFrom("Mozilla/5.0 (Windows NT 10.0)"), "desktop");
   assert.equal(deviceFrom(""), "unknown");
 });
+
+test("parseCheck takes the organisation from the server's list, not the browser", () => {
+  const { row } = parseCheck({ q: "mri", plan: "ruby", status: "ok", service: "s80", org: "1064", org_name: "Fake Name" }, "");
+  assert.equal(row.org_id, 1064);
+  assert.equal(row.org_name, "ProHealth HMO Limited");
+  assert.equal(row.org_region, "North Central");
+  const none = parseCheck({ q: "mri", plan: "ruby", status: "ok", org: "999999" }, "").row;
+  assert.equal(none.org_id, null);
+  assert.equal(none.org_name, null);
+});

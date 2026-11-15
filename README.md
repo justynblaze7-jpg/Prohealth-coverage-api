@@ -50,6 +50,16 @@ python3 scripts/build_plans.py "PROHEALTH_PLANS_2027.xlsx"
 
 Everyday words ("toothache" for Simple Extraction, "typhoid" for Widal) live in the `ALIAS` list in `scripts/build_plans.py`. Add to it when the dashboard shows common unanswered questions. Commit and push; Vercel redeploys.
 
+## Updating the organisation list
+
+The "Your organisation" picker reads `orgs.json`; the API checks each CBA ID against `lib/orgs.js`. Both come from the CBA Group Lookup report:
+
+```bash
+python3 scripts/build_orgs.py "CBA_Group_Lookup.xlsx"
+```
+
+Only the CBA ID, group name, state, region, sector and policy end date are kept. Contact names, emails, phone numbers and addresses are not copied, because `orgs.json` is public. State is read from the address and sector from the name (the report's Sector column is empty); the script prints any group it could not place so you can add a rule. Each stored check gets `org_id`, `org_name`, `org_state`, `org_region` and `org_sector`; existing databases get these columns automatically on the next request.
+
 ## Tests
 
 ```bash

@@ -120,6 +120,14 @@ button{font:inherit;cursor:pointer;color:inherit}
 .btn:active{opacity:.8}
 button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--tint);outline-offset:2px}
 
+/* Organisation picker */
+.orgbox .ic{color:var(--label-2);width:18px;height:18px}
+.clearbtn{border:0;background:var(--fill);color:var(--label-2);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;padding:0}
+.clearbtn .ic{width:14px;height:14px}
+.orglist{max-height:320px;overflow-y:auto;overscroll-behavior:contain}
+.orglist button[aria-selected="true"]{background:var(--fill)}
+.orglist .none{padding:12px 16px;color:var(--label-2);font-size:.9375rem}
+.orgbox.picked input{font-weight:600}
 /* Chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--edge);background:var(--card);box-shadow:0 1px 2px rgba(16,24,40,.06);color:var(--label);font-size:.875rem;font-weight:500}
@@ -177,6 +185,14 @@ table{border-collapse:collapse;width:100%;font-size:.875rem}
 th,td{text-align:left;padding:10px 16px;border-bottom:.5px solid var(--sep);white-space:nowrap}
 tr:last-child td{border-bottom:0}
 td.q{white-space:normal;min-width:160px}
+td.o{white-space:normal;min-width:140px}
+.renew{align-items:flex-start}
+.renew .rn{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.renew .rd{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:.9375rem;font-variant-numeric:tabular-nums}
+.search input:focus-visible{outline:none}
+.quiet{padding:12px 16px;font-size:.9375rem;line-height:1.6}
+.quiet summary{cursor:pointer;color:var(--tint);font-weight:600}
+.quiet p{margin:8px 0 0;color:var(--label-2);font-size:.875rem}
 th{font-size:.75rem;font-weight:600;color:var(--label-2);text-transform:uppercase;letter-spacing:.02em}
 .empty{padding:14px 16px;color:var(--label-2);font-size:.9375rem}
 .tag{white-space:nowrap;font-size:.75rem;font-weight:600;padding:2px 8px;border-radius:6px;display:inline-block}
@@ -225,6 +241,13 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
           <select id="plan" aria-label="Your plan"></select>
         </div>
       </div>
+    </div>
+
+    <div class="group" id="orgGroup">
+      <label class="fieldlabel" for="org" style="padding-left:14px">Your organisation</label>
+      <div class="search orgbox"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><input type="text" id="org" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="orgList" aria-describedby="orghint" placeholder="Search your company or employer" autocomplete="off" spellcheck="false"><button type="button" class="clearbtn" id="orgClear" aria-label="Clear organisation" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+      <span id="orghint" class="gfoot">Optional. The company or group your ProHealth plan comes through.</span>
+      <div class="suggest orglist" id="orgList" role="listbox" aria-label="Organisations" hidden></div>
     </div>
 
     <form class="group" id="searchForm" autocomplete="off">
@@ -278,6 +301,16 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
     <div class="group"><span class="ghead">Most-checked services</span><div class="card"><div class="bars" id="topServices"></div></div></div>
     <div class="group"><span class="ghead">Questions the page couldn't answer</span><div class="card" id="unanswered"></div><span class="gfoot">Gaps in the plan wording or the service list. Each one is a likely call-centre call.</span></div>
     <div class="group"><span class="ghead">Checks that hit a "not covered" answer</span><div class="card"><div class="bars" id="notCovered"></div></div><span class="gfoot">Services enrollees want but their plan excludes. Useful for plan design and upgrade conversations.</span></div>
+    <div class="titlebox" style="padding-top:12px"><span class="eyebrow">By organisation</span><h2>Which organisations are asking</h2><p class="note" style="font-size:.9375rem">Based on the organisation enrollees pick on the form. Regions are Nigeria's geopolitical zones; state comes from each group's address.</p></div>
+    <div class="stats" id="orgStats"></div>
+    <div class="group"><span class="ghead">Organisations with the most checks</span><div class="card"><div class="bars" id="topOrgs"></div></div></div>
+    <div class="group"><span class="ghead">Checks by region</span><div class="card"><div class="bars" id="byRegion"></div></div></div>
+    <div class="group"><span class="ghead">Checks by state</span><div class="card"><div class="bars" id="byState"></div></div></div>
+    <div class="group"><span class="ghead">Checks by sector</span><div class="card"><div class="bars" id="bySector"></div></div></div>
+    <div class="group"><span class="ghead">Where enrollees hit a wall</span><div class="card"><div class="bars" id="orgWalls"></div></div><span class="gfoot">Checks that ended in "not covered" or no answer, by organisation. Worth a call from the account manager or a quick HR briefing.</span></div>
+    <div class="group"><span class="ghead">Policies ending in the next 60 days</span><div class="card" id="renewals"></div><span class="gfoot">Use the activity here in renewal conversations: what their staff check most, and where the plan fell short.</span></div>
+    <div class="group"><span class="ghead">Organisations with no checks yet</span><div class="card" id="quietOrgs"></div><span class="gfoot">Good targets for an HR reminder, the QR poster or the next Wellness Hour.</span></div>
+
     <div class="group"><span class="ghead">Recent checks</span><div class="card tablewrap" id="recent"></div></div>
 
     <div class="group">
@@ -292,7 +325,7 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
 
 
 <script>
-fetch("/plans.json").then(r=>r.json()).then(DATA=>{
+Promise.all([fetch("/plans.json").then(r=>r.json()), fetch("/orgs.json").then(r=>r.ok?r.json():[]).catch(()=>[])]).then(([DATA, ORGS])=>{
 // ---------- Backend config ----------
 const API_BASE = (document.querySelector('meta[name="api-base"]')?.content || "").replace(/\/$/, "");
 const params = new URLSearchParams(location.search);
@@ -309,7 +342,7 @@ const SERVICES = DATA.services;
 const STATUS_TEXT = {ok:"Covered", lim:"Covered, with a limit", no:"Not covered", gap:"Not stated in the schedule", unk:"We couldn't find this"};
 
 const $ = id => document.getElementById(id);
-const ICONS = {"shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"M9 12h6\"/><path d=\"M12 9v6\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "arrow-right": "<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>", "chevron-down": "<path d=\"m6 9 6 6 6-6\"/>", "chevron-updown": "<path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "check-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/>", "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m15 9-6 6\"/><path d=\"m9 9 6 6\"/>", "help-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\"/><path d=\"M12 17h.01\"/>", "search-x": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/><path d=\"m13.5 8.5-5 5\"/><path d=\"m8.5 8.5 5 5\"/>", "id-card": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/><circle cx=\"8\" cy=\"12\" r=\"2\"/><path d=\"M14 10h4\"/><path d=\"M14 14h4\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M10 13H8\"/><path d=\"M16 17H8\"/>", "wallet": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/>", "folder": "<path d=\"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z\"/>", "thumbs-up": "<path d=\"M7 10v12\"/><path d=\"M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z\"/>", "thumbs-down": "<path d=\"M17 14V2\"/><path d=\"M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>", "key": "<circle cx=\"7.5\" cy=\"15.5\" r=\"5.5\"/><path d=\"m21 2-9.6 9.6\"/><path d=\"m15.5 7.5 3 3L22 7l-3-3\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/>", "log-out": "<path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"/><path d=\"m16 17 5-5-5-5\"/><path d=\"M21 12H9\"/>", "trending-up": "<path d=\"M22 7 13.5 15.5 8.5 10.5 2 17\"/><path d=\"M16 7h6v6\"/>", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m4.9 4.9 14.2 14.2\"/>", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/><path d=\"M12 7v5l4 2\"/>", "flask": "<path d=\"M10 2v7.5L4.3 19a2 2 0 0 0 1.7 3h12a2 2 0 0 0 1.7-3L14 9.5V2\"/><path d=\"M8.5 2h7\"/><path d=\"M7 16h10\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h18\"/>", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>", "lock-open": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 9.9-1\"/>", "baby": "<path d=\"M9 12h.01\"/><path d=\"M15 12h.01\"/><path d=\"M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5\"/><path d=\"M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1\"/>"};
+const ICONS = {"shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/><path d=\"M9 12h6\"/><path d=\"M12 9v6\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>", "arrow-right": "<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>", "chevron-down": "<path d=\"m6 9 6 6 6-6\"/>", "chevron-updown": "<path d=\"m7 15 5 5 5-5\"/><path d=\"m7 9 5-5 5 5\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "check-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m9 12 2 2 4-4\"/>", "info": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 16v-4\"/><path d=\"M12 8h.01\"/>", "x-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m15 9-6 6\"/><path d=\"m9 9 6 6\"/>", "help-circle": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3\"/><path d=\"M12 17h.01\"/>", "search-x": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/><path d=\"m13.5 8.5-5 5\"/><path d=\"m8.5 8.5 5 5\"/>", "id-card": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/><circle cx=\"8\" cy=\"12\" r=\"2\"/><path d=\"M14 10h4\"/><path d=\"M14 14h4\"/>", "file-text": "<path d=\"M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z\"/><path d=\"M14 2v4a2 2 0 0 0 2 2h4\"/><path d=\"M10 13H8\"/><path d=\"M16 17H8\"/>", "wallet": "<path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/>", "folder": "<path d=\"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z\"/>", "thumbs-up": "<path d=\"M7 10v12\"/><path d=\"M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z\"/>", "thumbs-down": "<path d=\"M17 14V2\"/><path d=\"M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>", "key": "<circle cx=\"7.5\" cy=\"15.5\" r=\"5.5\"/><path d=\"m21 2-9.6 9.6\"/><path d=\"m15.5 7.5 3 3L22 7l-3-3\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/>", "log-out": "<path d=\"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4\"/><path d=\"m16 17 5-5-5-5\"/><path d=\"M21 12H9\"/>", "trending-up": "<path d=\"M22 7 13.5 15.5 8.5 10.5 2 17\"/><path d=\"M16 7h6v6\"/>", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m4.9 4.9 14.2 14.2\"/>", "history": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/><path d=\"M12 7v5l4 2\"/>", "flask": "<path d=\"M10 2v7.5L4.3 19a2 2 0 0 0 1.7 3h12a2 2 0 0 0 1.7-3L14 9.5V2\"/><path d=\"M8.5 2h7\"/><path d=\"M7 16h10\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h18\"/>", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>", "lock-open": "<rect x=\"3\" y=\"11\" width=\"18\" height=\"11\" rx=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 9.9-1\"/>", "baby": "<path d=\"M9 12h.01\"/><path d=\"M15 12h.01\"/><path d=\"M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5\"/><path d=\"M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1\"/>", "building": "<path d=\"M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z\"/><path d=\"M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2\"/><path d=\"M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2\"/><path d=\"M10 6h4\"/><path d=\"M10 10h4\"/><path d=\"M10 14h4\"/><path d=\"M10 18h4\"/>"};
 const ic = n => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||""}</svg>`;
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -382,7 +415,7 @@ function show(s, typed, log, method="search"){
       <span class="pill unk">${STATUS_TEXT.unk}</span>
       <h2>No answer for "${esc(typed)}" yet</h2>
       <p>Call ProHealth before you go, or ask the hospital to confirm with ProHealth. We've noted this question so the plan guide can be improved.</p></div></div></div>${log?feedbackBox():""}</div>`;
-    if(log) record({q:typed, service:null, status:"unk", plan, method});
+    if(log) record({q:typed, service:null, status:"unk", plan, method, ...orgFields()});
     return;
   }
   const r = forPlan(s, plan);
@@ -412,8 +445,64 @@ function show(s, typed, log, method="search"){
       ${PLANS.map(p=>{const x=forPlan(s,p.id);return `<div class="row planrow${p.id===plan?" mine":""}"><span class="key">${esc(p.name)}${p.id===plan?' (yours)':''}</span><span class="val"><span class="tag ${x.status}">${STATUS_TEXT[x.status]}</span>${/^(covered|not covered|not stated in the schedule)$/i.test(x.text.trim())?"":`<small>${esc(x.text)}</small>`}</span></div>`}).join("")}
     </div></div>
     ${log?feedbackBox():""}</div>`;
-  if(log) record({q:typed, service:s.id, service_name:s.name, section:s.sec, answer:r.text, status:r.status, plan, method});
+  if(log) record({q:typed, service:s.id, service_name:s.name, section:s.sec, answer:r.text, status:r.status, plan, method, ...orgFields()});
 }
+
+// ---------- Organisation picker ----------
+// Searchable list of ProHealth's corporate groups (orgs.json). Only the CBA ID is sent;
+// the server looks up the name, state, region and sector itself.
+const ORG_BY_ID = new Map(ORGS.map(o=>[o.id,o]));
+let selectedOrg = null, orgMatches = [], orgActive = -1;
+const orgWords = s => s.toLowerCase().replace(/[^a-z0-9& ]+/g," ").split(/\s+/).filter(Boolean);
+function findOrgs(q){
+  const w = orgWords(q);
+  if(!w.length) return ORGS.slice();
+  return ORGS.map(o=>{ const n=" "+orgWords(o.name).join(" ")+" ", st=o.state.toLowerCase();
+      let sc=0; for(const x of w){ if(n.includes(" "+x)) sc+=2; else if(n.includes(x)||st.startsWith(x)) sc+=1; else return null; }
+      return {o, sc: sc + (n.startsWith(" "+w[0])?3:0)}; })
+    .filter(Boolean).sort((a,b)=>b.sc-a.sc||a.o.name.localeCompare(b.o.name)).map(x=>x.o);
+}
+function orgOptionHtml(o,i){
+  const where = o.state!=="Not stated" ? `${esc(o.state)} · ${esc(o.sector)}` : esc(o.sector);
+  return `<button type="button" role="option" id="orgopt-${i}" data-org="${o.id}" aria-selected="${i===orgActive}">${esc(o.name)}<small>${where}</small></button>`;
+}
+function openOrgList(){
+  orgMatches = findOrgs(selectedOrg ? "" : $("org").value);
+  const list = $("orgList");
+  list.innerHTML = orgMatches.length
+    ? orgMatches.slice(0,60).map(orgOptionHtml).join("") + `<button type="button" role="option" data-org="0">My organisation isn't listed<small>Check coverage without picking one</small></button>`
+    : `<div class="none">No organisation matches "${esc($("org").value)}". Check the spelling, or leave this blank.</div><button type="button" role="option" data-org="0">My organisation isn't listed<small>Check coverage without picking one</small></button>`;
+  list.hidden = false; $("org").setAttribute("aria-expanded","true");
+}
+function closeOrgList(){ $("orgList").hidden = true; $("org").setAttribute("aria-expanded","false"); $("org").removeAttribute("aria-activedescendant"); orgActive=-1; }
+function setOrg(o, remember=true){
+  selectedOrg = o && o.id ? o : null;
+  $("org").value = selectedOrg ? selectedOrg.name : (o && o.id===0 ? "Not listed" : "");
+  document.querySelector(".orgbox").classList.toggle("picked", !!selectedOrg);
+  $("orgClear").hidden = !$("org").value;
+  if(remember){ try{ localStorage.setItem("prohealth-org", selectedOrg ? String(selectedOrg.id) : ""); }catch(e){} }
+  closeOrgList();
+}
+$("org").addEventListener("focus", ()=>{ if(selectedOrg || $("org").value==="Not listed"){ $("org").select(); } openOrgList(); });
+$("org").addEventListener("input", ()=>{ selectedOrg=null; document.querySelector(".orgbox").classList.remove("picked"); $("orgClear").hidden=!$("org").value; orgActive=-1; openOrgList(); });
+$("org").addEventListener("keydown", e=>{
+  const opts=[...$("orgList").querySelectorAll("button[data-org]")];
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+    e.preventDefault(); if($("orgList").hidden) openOrgList();
+    const all=[...$("orgList").querySelectorAll("button[data-org]")]; if(!all.length) return;
+    orgActive = e.key==="ArrowDown" ? Math.min(all.length-1, orgActive+1) : Math.max(0, orgActive-1);
+    all.forEach((b,i)=>b.setAttribute("aria-selected", i===orgActive)); all[orgActive].scrollIntoView({block:"nearest"});
+    $("org").setAttribute("aria-activedescendant", all[orgActive].id||"");
+  } else if(e.key==="Enter"){
+    if(!$("orgList").hidden){ e.preventDefault(); const pick = opts[orgActive>=0?orgActive:0]; if(pick) pick.click(); }
+  } else if(e.key==="Escape"){ closeOrgList(); }
+});
+$("orgList").addEventListener("mousedown", e=>e.preventDefault()); // keep focus in the box while picking
+$("orgList").addEventListener("click", e=>{ const b=e.target.closest("button[data-org]"); if(!b) return; const id=+b.dataset.org; setOrg(id ? ORG_BY_ID.get(id) : {id:0}); });
+$("org").addEventListener("blur", ()=>{ setTimeout(()=>{ if(document.activeElement!==$("org")){ closeOrgList(); if(!selectedOrg && $("org").value!=="Not listed"){ const m=findOrgs($("org").value); if($("org").value.trim() && m.length===1) setOrg(m[0]); } } },120); });
+$("orgClear").addEventListener("click", ()=>{ setOrg(null); $("org").focus(); });
+try{ const saved = +localStorage.getItem("prohealth-org"); if(saved && ORG_BY_ID.has(saved)) setOrg(ORG_BY_ID.get(saved), false); }catch(e){}
+const orgFields = () => selectedOrg ? {org:selectedOrg.id, org_name:selectedOrg.name, org_state:selectedOrg.state, org_region:selectedOrg.region, org_sector:selectedOrg.sector} : {org:null};
 
 // ---------- Logging ----------
 // Each check is sent anonymously to the backend. The staff view reads insights with a staff key.
@@ -448,7 +537,7 @@ let summary=null;
 // Without a valid key nothing is shown: no stats, no lists, no sample data.
 function lockInsights(note){
   rows=[]; summary=null; sampleRows=[]; $("sampleBtn").textContent="Load sample activity for a presentation";
-  ["stats","topServices","unanswered","notCovered","recent"].forEach(id=>$(id).innerHTML="");
+  ["stats","topServices","unanswered","notCovered","recent","orgStats","topOrgs","byRegion","byState","bySector","orgWalls","renewals","quietOrgs"].forEach(id=>$(id).innerHTML="");
   $("insightsBody").hidden=true; $("staffTools").hidden=true; $("keyForm").hidden=false; $("sourceNote").textContent=note;
 }
 async function loadInsights(){
@@ -494,6 +583,45 @@ function bars(entries, cls, empty){
   return entries.slice(0,8).map(([k,n])=>`<div class="bar"><span>${esc(k)}</span><span class="n">${n}</span><div class="track"><div class="fill ${cls}" style="width:${Math.max(4,Math.round(n/max*100))}%"></div></div></div>`).join("");
 }
 const nameOf = id => (byId(id)||{}).name || "Unknown service";
+// ---------- Organisation insights ----------
+const fmtDate = iso => new Date(iso+"T00:00:00").toLocaleDateString([], {day:"numeric", month:"short", year:"numeric"});
+function renderOrgInsights(all){
+  const withOrg = all.filter(r=>r.org);
+  const used = new Set(withOrg.map(r=>r.org));
+  const orgOf = r => ORG_BY_ID.get(r.org) || {name:r.org_name||"Unknown", state:r.org_state||"Not stated", region:r.org_region||"Not stated", sector:r.org_sector||"Other"};
+  const regionCounts = count(withOrg, r=>orgOf(r).region);
+  const pctWith = all.length ? Math.round(withOrg.length/all.length*100)+"%" : "0%";
+  $("orgStats").innerHTML = [
+    [`${used.size} of ${ORGS.length}`, "organisations have used it"],
+    [pctWith, "of checks named an organisation"],
+    [regionCounts[0] ? regionCounts[0][0] : "None yet", "busiest region"],
+  ].map(([b,s])=>`<div class="stat"><b style="font-size:${String(b).length>9?"1.25rem":"1.75rem"}">${esc(b)}</b><span>${s}</span></div>`).join("");
+
+  $("topOrgs").innerHTML = bars(count(withOrg, r=>{ const o=orgOf(r); return `${o.name} · ${o.state}`; }), "", "No checks with an organisation yet.");
+  $("byRegion").innerHTML = bars(regionCounts, "", "No checks with an organisation yet.");
+  $("byState").innerHTML = bars(count(withOrg, r=>orgOf(r).state), "", "No checks with an organisation yet.");
+  $("bySector").innerHTML = bars(count(withOrg, r=>orgOf(r).sector), "", "No checks with an organisation yet.");
+
+  // Not covered or no answer, by organisation, with the share of that organisation's checks.
+  const tot = new Map(count(withOrg, r=>r.org));
+  const walls = count(withOrg.filter(r=>r.status==="no"||r.status==="unk"), r=>r.org)
+    .map(([id,n])=>[`${orgOf({org:id}).name}: ${n} of ${tot.get(id)} checks (${Math.round(n/tot.get(id)*100)}%)`, n]);
+  $("orgWalls").innerHTML = bars(walls, "pa", "No organisation has hit a not-covered or unanswered check yet.");
+
+  // Policies ending soon, with what their staff have been checking.
+  const today = new Date(); today.setHours(0,0,0,0);
+  const soon = ORGS.filter(o=>o.ends).map(o=>({o, days: Math.round((new Date(o.ends+"T00:00:00")-today)/864e5)}))
+    .filter(x=>x.days>=0 && x.days<=60).sort((a,b)=>a.days-b.days);
+  $("renewals").innerHTML = soon.length ? soon.map(({o,days})=>{
+      const rs=withOrg.filter(r=>r.org===o.id), bad=rs.filter(r=>r.status==="no"||r.status==="unk").length;
+      const when = days===0 ? "today" : `in ${days} day${days===1?"":"s"}`;
+      return `<div class="row renew"><div class="rn"><span>${esc(o.name)}</span><span class="note">${esc(o.state)} · ${rs.length} check${rs.length===1?"":"s"}${bad?` · <span class="tag no">${bad} not covered or unanswered</span>`:""}</span></div><div class="rd"><span>${fmtDate(o.ends)}</span><span class="note">${when}</span></div></div>`;
+    }).join("") : `<div class="empty">No policies end in the next 60 days.</div>`;
+
+  const quiet = ORGS.filter(o=>!used.has(o.id));
+  $("quietOrgs").innerHTML = `<div class="quiet"><strong>${quiet.length}</strong> of ${ORGS.length} organisations have no checks in this period.${quiet.length?`<details><summary>Show them</summary><p>${quiet.map(o=>esc(o.name)).join(" · ")}</p></details>`:""}</div>`;
+}
+
 function renderInsights(){
   $("insightsBody").hidden=false;
   const all = [...sampleRows, ...rows];
@@ -507,12 +635,20 @@ function renderInsights(){
   $("notCovered").innerHTML = bars(count(all.filter(r=>r.status==="no"), r=>`${nameOf(r.service)} (${planName(r.plan)})`), "pa", "No not-covered answers yet.");
   const un = count(all.filter(r=>r.status==="unk"), r=>r.q.toLowerCase());
   $("unanswered").innerHTML = un.length ? `<div class="bars">${bars(un,"unk","")}</div>` : `<div class="empty">Nothing unanswered yet. Questions the page can't match will appear here.</div>`;
+  renderOrgInsights(all);
   const recent = all.slice().sort((a,b)=>b.ts-a.ts).slice(0,12);
-  $("recent").innerHTML = recent.length ? `<table><thead><tr><th>When</th><th>Typed</th><th>Plan</th><th>Answer</th></tr></thead><tbody>${
-    recent.map(r=>`<tr><td>${new Date(r.ts).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}${r.sample?' <span class="tag gap">sample</span>':''}</td><td class="q">${esc(r.q)}</td><td>${esc(planName(r.plan))}</td><td><span class="tag ${r.status}">${STATUS_TEXT[r.status]}</span></td></tr>`).join("")
+  $("recent").innerHTML = recent.length ? `<table><thead><tr><th>When</th><th>Typed</th><th>Plan</th><th>Organisation</th><th>Answer</th></tr></thead><tbody>${
+    recent.map(r=>`<tr><td>${new Date(r.ts).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}${r.sample?' <span class="tag gap">sample</span>':''}</td><td class="q">${esc(r.q)}</td><td>${esc(planName(r.plan))}</td><td class="o">${r.org?esc((ORG_BY_ID.get(r.org)||{}).name||r.org_name||""):'<span class="note">Not given</span>'}</td><td><span class="tag ${r.status}">${STATUS_TEXT[r.status]}</span></td></tr>`).join("")
   }</tbody></table>` : `<div class="empty">No checks yet.</div>`;
 }
 
+// Sample organisations: a few busy ones, a long tail, and some checks with no organisation picked.
+const SAMPLE_ORGS = [1064,1100,1007,1052,1003,1145,1294,1241,1004,1183,1219,1306,1285,1310,1196,1291];
+function sampleOrg(i){
+  if(i%6===5) return {org:null};
+  const u = ((i*37)%97)/97, o = ORG_BY_ID.get(SAMPLE_ORGS[Math.floor(u*u*SAMPLE_ORGS.length)]);
+  return o ? {org:o.id, org_name:o.name, org_state:o.state, org_region:o.region, org_sector:o.sector} : {org:null};
+}
 $("sampleBtn").addEventListener("click", ()=>{
   if(sampleRows.length){ sampleRows=[]; $("sampleBtn").textContent="Load sample activity for a presentation"; renderInsights(); return; }
   const qs = [["antenatal",6],["caesarean",4],["mri",5],["scaling",4],["glasses",4],["dialysis",3],["gym",2],["root canal",3],["ct scan",2],["hypertension",2],["mammogram",2],["does my plan cover ivf",2],["can i change my hospital",2],["is my wife covered",2],["covid test",1]];
@@ -520,7 +656,7 @@ $("sampleBtn").addEventListener("click", ()=>{
   for(const [q,n] of qs) for(let k=0;k<n;k++){
     const pl=PLANS[(i*7)%5].id; const s=bestMatches(q)[0];
     const st = s ? forPlan(s,pl).status : "unk";
-    sampleRows.push({q, service:s?s.id:null, status: /ivf|hospital|wife|covid/.test(q)?"unk":st, plan:pl, ts:now-(i++)*3.7e6, sample:true});
+    const so = sampleOrg(i); sampleRows.push({q, ...so, service:s?s.id:null, status: /ivf|hospital|wife|covid/.test(q)?"unk":st, plan:pl, ts:now-(i++)*3.7e6, sample:true});
   }
   sampleRows.forEach(r=>{ if(r.status==="unk") r.service=null; });
   $("sampleBtn").textContent="Remove sample activity"; renderInsights();
