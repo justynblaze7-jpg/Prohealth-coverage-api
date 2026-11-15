@@ -6,166 +6,291 @@
 <title>Can I Use My Plan? | ProHealth HMO</title>
 <!-- The API runs on this same site (/api/...). Only set an address here if the API is ever hosted elsewhere. -->
 <meta name="api-base" content="">
-<meta name="description" content="Check what your ProHealth HMO plan covers before you visit the hospital.">
+<meta name="description" content="Check what your ProHealth plan covers.">
+<meta name="theme-color" content="#f4fbf8">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0..1,0&display=block">
 <style>[hidden]{display:none!important}img{max-width:100%}</style>
 <style>
-/* Layout: single narrow column, enrollee checker first; staff insights as a second hash view with tabular summaries. */
+/* Material Design 3. Seed colour: ProHealth teal. Light and dark schemes. */
 :root{
-  --bg:#f3f6f5; --surface:#ffffff; --ink:#13232a; --muted:#5a6b70; --line:#d9e2e0;
-  --accent:#0f6b5c; --accent-ink:#ffffff; --accent-soft:#e1f0ec;
-  --ok:#1d7a46; --ok-soft:#e3f4ea; --pa:#9a5b00; --pa-soft:#fdf1dc;
-  --no:#b3261e; --no-soft:#fbe7e5; --unk:#4b5563; --unk-soft:#eceff1;
-  --display:"Plus Jakarta Sans",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
-  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  --primary:#006a60; --on-primary:#fff; --primary-container:#9ef2e4; --on-primary-container:#00201c;
+  --secondary-container:#cce8e2; --on-secondary-container:#051f1c;
+  --surface:#f4fbf8; --surface-lowest:#fff; --surface-low:#eff5f2; --surface-container:#e9efec; --surface-high:#e3eae7; --surface-highest:#dee4e1;
+  --on-surface:#171d1b; --on-surface-variant:#3f4946; --outline:#6f7976; --outline-variant:#bec9c5;
+  --error:#ba1a1a; --error-container:#ffdad6; --on-error-container:#410002;
+  --ok:#1f6b3a; --ok-container:#c1efcb; --on-ok-container:#00210c;
+  --warn:#825500; --warn-container:#ffddb3; --on-warn-container:#2a1800;
+  --neutral:#4a5553; --neutral-container:#dee4e1; --on-neutral-container:#171d1b;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15);
+  --font:"Roboto Flex",Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0e1517; --surface:#162125; --ink:#e6eeec; --muted:#9aaeb0; --line:#26363a;
-  --accent:#4fc2a8; --accent-ink:#06201a; --accent-soft:#16332d;
-  --ok:#5fd18f; --ok-soft:#14301f; --pa:#f0b45c; --pa-soft:#33260f;
-  --no:#ff8a80; --no-soft:#3a1715; --unk:#b6c0c6; --unk-soft:#232d31; color-scheme:dark}}
+  --primary:#82d5c8; --on-primary:#003731; --primary-container:#005048; --on-primary-container:#9ef2e4;
+  --secondary-container:#334b47; --on-secondary-container:#cce8e2;
+  --surface:#0e1513; --surface-lowest:#090f0e; --surface-low:#171d1b; --surface-container:#1b211f; --surface-high:#252b2a; --surface-highest:#303634;
+  --on-surface:#dee4e1; --on-surface-variant:#bec9c5; --outline:#899390; --outline-variant:#3f4946;
+  --error:#ffb4ab; --error-container:#93000a; --on-error-container:#ffdad6;
+  --ok:#a6d3b0; --ok-container:#0d5229; --on-ok-container:#c1efcb;
+  --warn:#ffb951; --warn-container:#633f00; --on-warn-container:#ffddb3;
+  --neutral:#bec9c5; --neutral-container:#303634; --on-neutral-container:#dee4e1;
+  --shadow:0 1px 3px 1px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.5); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0e1517; --surface:#162125; --ink:#e6eeec; --muted:#9aaeb0; --line:#26363a;
-  --accent:#4fc2a8; --accent-ink:#06201a; --accent-soft:#16332d;
-  --ok:#5fd18f; --ok-soft:#14301f; --pa:#f0b45c; --pa-soft:#33260f;
-  --no:#ff8a80; --no-soft:#3a1715; --unk:#b6c0c6; --unk-soft:#232d31; color-scheme:dark}
+  --primary:#82d5c8; --on-primary:#003731; --primary-container:#005048; --on-primary-container:#9ef2e4;
+  --secondary-container:#334b47; --on-secondary-container:#cce8e2;
+  --surface:#0e1513; --surface-lowest:#090f0e; --surface-low:#171d1b; --surface-container:#1b211f; --surface-high:#252b2a; --surface-highest:#303634;
+  --on-surface:#dee4e1; --on-surface-variant:#bec9c5; --outline:#899390; --outline-variant:#3f4946;
+  --error:#ffb4ab; --error-container:#93000a; --on-error-container:#ffdad6;
+  --ok:#a6d3b0; --ok-container:#0d5229; --on-ok-container:#c1efcb;
+  --warn:#ffb951; --warn-container:#633f00; --on-warn-container:#ffddb3;
+  --neutral:#bec9c5; --neutral-container:#303634; --on-neutral-container:#dee4e1;
+  --shadow:0 1px 3px 1px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.5); color-scheme:dark}
+
+*{box-sizing:border-box}
 html,body{min-height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
-.wrap{max-width:680px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
-h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
-h1{font-size:1.65rem;font-weight:800}
-h2{font-size:1.15rem;font-weight:700}
-h3{font-size:.95rem;font-weight:700}
-p{margin:0}
-.muted{color:var(--muted)}
-.eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--accent)}
-.demo-banner{background:var(--pa-soft);color:var(--ink);border:1px dashed var(--pa);border-radius:10px;padding:8px 12px;font-size:.82rem}
-.tabs{display:flex;gap:6px;flex-wrap:wrap}
-.tabs a{padding:7px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.88rem;border:1px solid var(--line);background:var(--surface)}
-.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
-label{font-weight:600;font-size:.88rem}
-select,input[type="search"],input[type="password"]{width:100%;box-sizing:border-box;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
-select:focus-visible,input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.field{display:flex;flex-direction:column;gap:6px}
-.searchrow{display:flex;gap:8px}
-.searchrow input{flex:1;min-width:0}
-button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 14px;font-weight:600}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font-size:.82rem;padding:6px 11px;border-radius:999px;font-weight:500;background:var(--accent-soft);border-color:transparent;color:var(--ink)}
-.suggest{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.suggest button small{display:block;color:var(--muted);font-size:.75rem;font-weight:400}
-.suggest button{border:0;border-radius:0;text-align:left;font-weight:500;border-bottom:1px solid var(--line)}
-.suggest button:last-child{border-bottom:0}
-.result{border-radius:14px;border:1px solid var(--line);background:var(--surface);overflow:hidden}
-.verdict{padding:16px 18px;display:flex;flex-direction:column;gap:6px}
-.verdict.ok{background:var(--ok-soft)} .verdict.pa,.verdict.lim{background:var(--pa-soft)} .verdict.gap{background:var(--unk-soft)} .verdict.no{background:var(--no-soft)} .verdict.unk{background:var(--unk-soft)}
-.pill{align-self:flex-start;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:999px;color:var(--surface)}
-.pill.ok{background:var(--ok)} .pill.pa,.pill.lim{background:var(--pa)} .pill.gap{background:var(--unk)} .pill.no{background:var(--no)} .pill.unk{background:var(--unk)}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--line)}
-.fact{background:var(--surface);padding:12px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
-.fact dt{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
-.fact dd{margin:0;font-weight:500}
-.desk{padding:16px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
-.desk ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
-.desk .say{background:var(--bg);border-left:3px solid var(--accent);padding:10px 12px;border-radius:6px;font-style:italic}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.note{font-size:.8rem;color:var(--muted)}
-.emerg{border:1px solid var(--no);background:var(--no-soft);border-radius:10px;padding:10px 12px;font-size:.86rem}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
-.stat span{font-size:.8rem;color:var(--muted)}
-.bars{display:flex;flex-direction:column;gap:8px}
-.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:.88rem}
-.bar .track{grid-column:1/-1;height:8px;border-radius:99px;background:var(--bg);overflow:hidden}
-.bar .fill{height:100%;background:var(--accent);border-radius:99px}
-.bar .fill.pa{background:var(--pa)} .bar .fill.unk{background:var(--unk)}
-.bar .n{font-variant-numeric:tabular-nums;color:var(--muted)}
+body{margin:0;background:var(--surface);color:var(--on-surface);font-family:var(--font);font-size:16px;line-height:1.5;letter-spacing:.01em;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+h1{font-size:2.25rem;line-height:2.75rem;font-weight:500;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:1.5rem;line-height:2rem;font-weight:500;text-wrap:balance}
+h3{font-size:1rem;line-height:1.5rem;font-weight:600;letter-spacing:.01em}
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings:"liga";-webkit-font-smoothing:antialiased;font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24;user-select:none;flex:none}
+.ms.fill{font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.ms.sm{font-size:20px}
+.muted{color:var(--on-surface-variant)}
+.note{font-size:.8125rem;line-height:1.25rem;color:var(--on-surface-variant)}
+
+/* Top app bar */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);transition:background .2s}
+.appbar.scrolled{background:var(--surface-container)}
+.appbar-in{max-width:720px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:1.0625rem}
+.brand .logo{width:40px;height:40px;border-radius:12px;background:var(--primary-container);color:var(--on-primary-container);display:grid;place-items:center}
+
+/* Segmented buttons (view switch) */
+.segmented{display:flex;border:1px solid var(--outline);border-radius:999px;overflow:hidden;height:40px}
+.segmented a{display:flex;align-items:center;gap:6px;padding:0 14px;text-decoration:none;color:var(--on-surface);font-size:.875rem;font-weight:500;letter-spacing:.01em}
+.segmented a+a{border-left:1px solid var(--outline)}
+.segmented a[aria-current="page"]{background:var(--secondary-container);color:var(--on-secondary-container)}
+.segmented a:not([aria-current="page"]) .ms{display:none}
+
+.wrap{max-width:720px;margin:0 auto;padding-block:8px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.view{display:flex;flex-direction:column;gap:16px}
+.hero{display:flex;flex-direction:column;gap:6px;padding:8px 4px 4px}
+.hero p{font-size:1rem;color:var(--on-surface-variant)}
+
+/* Cards */
+.card{background:var(--surface-low);border-radius:28px;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.card.elevated{background:var(--surface-lowest);box-shadow:var(--shadow)}
+.card-title{display:flex;align-items:center;gap:8px}
+.card-title .ms{color:var(--primary)}
+
+/* Filled text field / select with floating label */
+.tf{position:relative;display:flex;align-items:center;background:var(--surface-highest);border-radius:4px 4px 0 0;border-bottom:1px solid var(--on-surface-variant);min-height:56px;transition:border-color .15s}
+.tf:focus-within{border-bottom:2px solid var(--primary)}
+.tf>.ms{position:absolute;left:12px;color:var(--on-surface-variant);pointer-events:none}
+.tf label{position:absolute;left:52px;top:8px;font-size:.75rem;line-height:1rem;color:var(--on-surface-variant);pointer-events:none}
+.tf:focus-within label{color:var(--primary)}
+.tf select,.tf input{appearance:none;-webkit-appearance:none;width:100%;border:0;background:transparent;color:var(--on-surface);font:inherit;font-size:1rem;padding:24px 44px 6px 52px;outline:none;border-radius:4px 4px 0 0}
+.tf .arrow{position:absolute;right:12px;left:auto;color:var(--on-surface-variant);pointer-events:none}
+.tf select option{color:#171d1b}
+
+/* Search bar */
+.searchbar{display:flex;align-items:center;gap:4px;background:var(--surface-high);border-radius:28px;height:56px;padding:0 4px 0 16px;transition:box-shadow .15s}
+.searchbar:focus-within{box-shadow:0 0 0 2px var(--primary)}
+.searchbar>.ms{color:var(--on-surface-variant)}
+.searchbar input{flex:1;min-width:0;border:0;background:transparent;color:var(--on-surface);font:inherit;font-size:1rem;padding:0 8px;height:100%;outline:none}
+.searchbar input::placeholder{color:var(--on-surface-variant)}
+.searchbar input::-webkit-search-cancel-button{display:none}
+
+/* Buttons */
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 24px;border-radius:999px;border:0;font-size:.875rem;font-weight:500;letter-spacing:.01em;position:relative;overflow:hidden;transition:box-shadow .15s}
+.btn .ms{font-size:18px}
+.btn.filled{background:var(--primary);color:var(--on-primary)}
+.btn.filled:hover{box-shadow:var(--shadow)}
+.btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
+.btn.outlined{background:transparent;border:1px solid var(--outline);color:var(--primary)}
+.btn.text{background:transparent;color:var(--primary);padding:0 12px}
+.btn::after,.iconbtn::after,.chip::after,.segmented a::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s;pointer-events:none}
+.btn:hover::after,.iconbtn:hover::after,.chip:hover::after{opacity:.08}
+.btn:active::after,.iconbtn:active::after,.chip:active::after{opacity:.12}
+.segmented a{position:relative}
+.segmented a:hover::after{opacity:.08}
+.iconbtn{width:48px;height:48px;border-radius:999px;border:0;display:grid;place-items:center;background:transparent;color:var(--on-surface-variant);position:relative;overflow:hidden;flex:none}
+.iconbtn.filled{background:var(--primary);color:var(--on-primary);width:48px;height:48px}
+.iconbtn.tonal{background:var(--secondary-container);color:var(--on-secondary-container);width:40px;height:40px}
+.iconbtn[aria-pressed="true"]{background:var(--primary);color:var(--on-primary)}
+.iconbtn:disabled{opacity:.38;cursor:default}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 16px 0 8px;border-radius:8px;border:1px solid var(--outline-variant);background:transparent;color:var(--on-surface-variant);font-size:.875rem;font-weight:500;position:relative;overflow:hidden}
+.chip .ms{font-size:18px;color:var(--primary)}
+
+/* Search suggestions (menu) */
+.suggest{display:flex;flex-direction:column;background:var(--surface-container);border-radius:16px;padding:8px 0;box-shadow:var(--shadow)}
+.suggest button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:0;background:transparent;padding:10px 16px;font-size:1rem;color:var(--on-surface);position:relative}
+.suggest button:hover{background:var(--surface-highest)}
+.suggest button small{color:var(--on-surface-variant);font-size:.8125rem}
+
+/* Result card */
+.result{background:var(--surface-lowest);border-radius:28px;box-shadow:var(--shadow);overflow:hidden}
+.verdict{padding:20px;display:flex;gap:16px;align-items:flex-start}
+.verdict .ms{font-size:40px}
+.verdict .vtext{display:flex;flex-direction:column;gap:2px;min-width:0}
+.verdict .label{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.verdict.ok{background:var(--ok-container);color:var(--on-ok-container)} .verdict.ok .ms,.verdict.ok .label{color:var(--ok)}
+.verdict.lim{background:var(--warn-container);color:var(--on-warn-container)} .verdict.lim .ms,.verdict.lim .label{color:var(--warn)}
+.verdict.no{background:var(--error-container);color:var(--on-error-container)} .verdict.no .ms,.verdict.no .label{color:var(--error)}
+.verdict.gap,.verdict.unk{background:var(--neutral-container);color:var(--on-neutral-container)} .verdict.gap .ms,.verdict.unk .ms,.verdict.gap .label,.verdict.unk .label{color:var(--neutral)}
+.sect{padding:16px 20px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--outline-variant)}
+.list{display:flex;flex-direction:column}
+.li{display:flex;align-items:center;gap:16px;padding:8px 0;min-width:0}
+.li>.ms{color:var(--on-surface-variant)}
+.li .lt{display:flex;flex-direction:column;min-width:0}
+.li .over{font-size:.75rem;color:var(--on-surface-variant);letter-spacing:.03em}
+.plans{display:flex;flex-direction:column;gap:4px}
+.planrow{display:grid;grid-template-columns:minmax(84px,auto) auto minmax(0,1fr);gap:12px;align-items:center;padding:8px 12px;border-radius:12px;font-size:.875rem}
+.planrow.mine{background:var(--secondary-container);color:var(--on-secondary-container);font-weight:600}
+.planrow .pt{color:var(--on-surface-variant);min-width:0}
+.planrow.mine .pt{color:inherit}
+.say{background:var(--surface-container);border-radius:16px;padding:12px 8px 12px 16px;display:flex;gap:8px;align-items:flex-start}
+.say p{flex:1;font-size:.9375rem}
+.bring{display:flex;flex-wrap:wrap;gap:8px}
+.bring span{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 8px;border-radius:8px;background:var(--surface-container);font-size:.8125rem;font-weight:500}
+.bring .ms{font-size:18px;color:var(--primary)}
+details.more summary{cursor:pointer;color:var(--primary);font-size:.875rem;font-weight:500;list-style:none;display:flex;align-items:center;gap:4px}
+details.more summary::-webkit-details-marker{display:none}
+details.more[open] summary .ms{transform:rotate(180deg)}
+details.more p{margin-top:8px;font-size:.875rem;color:var(--on-surface-variant)}
+.fbrow{display:flex;align-items:center;gap:4px}
+.fbrow span:first-child{flex:1;font-size:.875rem;color:var(--on-surface-variant)}
+
+/* Banners */
+.banner{display:flex;gap:12px;align-items:center;border-radius:16px;padding:12px 16px;font-size:.875rem}
+.banner.error{background:var(--error-container);color:var(--on-error-container)}
+.banner.error .ms{color:var(--error)}
+
+/* Snackbar */
+.snackbar{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);background:var(--on-surface);color:var(--surface);padding:14px 16px;border-radius:4px;font-size:.875rem;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20;max-width:calc(100% - 32px)}
+.snackbar.show{opacity:1;transform:translate(-50%,0)}
+
+/* Staff view */
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface-low);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-size:2rem;line-height:2.5rem;font-weight:500;font-variant-numeric:tabular-nums;color:var(--primary)}
+.stat span{font-size:.8125rem;color:var(--on-surface-variant)}
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;font-size:.875rem}
+.bar .track{grid-column:1/-1;height:4px;border-radius:99px;background:var(--surface-highest);overflow:hidden}
+.bar .fill{height:100%;background:var(--primary);border-radius:99px}
+.bar .fill.pa{background:var(--warn)} .bar .fill.unk{background:var(--neutral)}
+.bar .n{font-variant-numeric:tabular-nums;color:var(--on-surface-variant)}
 .tablewrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.84rem}
-th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+table{border-collapse:collapse;width:100%;font-size:.875rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--outline-variant);white-space:nowrap}
 td.q{white-space:normal;min-width:160px}
-th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
-.empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);font-size:.88rem}
-.tag{white-space:nowrap;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:99px}
-.tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.pa,.tag.lim{background:var(--pa-soft);color:var(--pa)} .tag.gap{background:var(--unk-soft);color:var(--unk)} .tag.no{background:var(--no-soft);color:var(--no)} .tag.unk{background:var(--unk-soft);color:var(--unk)}
-footer{font-size:.78rem;color:var(--muted)}
-@media (prefers-reduced-motion:no-preference){.result{animation:rise .2s ease-out}@keyframes rise{from{transform:translateY(4px)}to{transform:none}}}
+th{font-size:.75rem;font-weight:500;color:var(--on-surface-variant);letter-spacing:.03em}
+.empty{padding:16px;border-radius:16px;background:var(--surface-container);color:var(--on-surface-variant);font-size:.875rem}
+.tag{white-space:nowrap;font-size:.75rem;font-weight:600;padding:2px 10px;border-radius:8px;display:inline-block}
+.tag.ok{background:var(--ok-container);color:var(--on-ok-container)} .tag.lim{background:var(--warn-container);color:var(--on-warn-container)}
+.tag.no{background:var(--error-container);color:var(--on-error-container)} .tag.gap,.tag.unk{background:var(--neutral-container);color:var(--on-neutral-container)}
+
+footer{font-size:.75rem;line-height:1.125rem;color:var(--on-surface-variant);display:flex;flex-direction:column;gap:6px;padding:0 4px}
+footer details summary{cursor:pointer;color:var(--primary)}
+
+@media (max-width:420px){ h1{font-size:2rem;line-height:2.5rem} .segmented a{padding:0 12px} .brand .name{display:none} }
+@media (prefers-reduced-motion:no-preference){.result{animation:rise .25s cubic-bezier(.2,0,0,1)}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="demo-banner">Based on ProHealth's 2026 corporate health plan schedule. Pre-authorisation rules and hospital choice still need confirming with ProHealth.</div>
+<header class="appbar" id="appbar">
+  <div class="appbar-in">
+    <div class="brand"><span class="logo"><span class="ms fill">health_and_safety</span></span><span class="name">ProHealth</span></div>
+    <nav class="segmented" aria-label="Views">
+      <a href="#check" id="tab-check"><span class="ms sm">check</span>Check</a>
+      <a href="#insights" id="tab-insights"><span class="ms sm">check</span>Insights</a>
+    </nav>
+  </div>
+</header>
 
-  <header style="display:flex;flex-direction:column;gap:6px">
-    <span class="eyebrow">ProHealth HMO · Enrollee self-service</span>
-    <h1>Can I use my plan for this?</h1>
-    <p class="muted">Pick your plan, tell us what you need, and get a clear answer before you get to the hospital.</p>
-  </header>
+<main class="wrap">
+  <section id="view-check" class="view">
+    <div class="hero">
+      <h1>Is it covered?</h1>
+      <p>Pick your plan, then search a service.</p>
+    </div>
 
-  <nav class="tabs" aria-label="Views">
-    <a href="#check" id="tab-check">Check coverage</a>
-    <a href="#insights" id="tab-insights">Staff insights</a>
-  </nav>
-
-  <section id="view-check" style="display:flex;flex-direction:column;gap:18px">
-    <div class="panel">
-      <div class="field">
+    <div class="card">
+      <div class="tf">
+        <span class="ms">badge</span>
         <label for="plan">Your plan</label>
         <select id="plan"></select>
+        <span class="ms arrow">arrow_drop_down</span>
       </div>
-      <form class="field" id="searchForm" autocomplete="off">
-        <label for="q">What do you need?</label>
-        <div class="searchrow">
-          <input type="search" id="q" placeholder="e.g. scaling, antenatal, MRI, glasses" aria-describedby="qhint">
-          <button class="primary" type="submit">Check</button>
+      <form id="searchForm" autocomplete="off" style="display:flex;flex-direction:column;gap:8px">
+        <div class="searchbar">
+          <span class="ms">search</span>
+          <input type="search" id="q" placeholder="MRI, antenatal, glasses…" aria-label="Service" aria-describedby="qhint">
+          <button class="iconbtn filled primary" type="submit" aria-label="Check"><span class="ms">arrow_forward</span></button>
         </div>
-        <span id="qhint" class="note">Type a service or tap a common one below. Don't enter your name or member number.</span>
+        <span id="qhint" class="note" style="padding-left:16px">No names or member numbers.</span>
         <div class="suggest" id="suggest" hidden></div>
       </form>
-      <div class="chips" id="chips" aria-label="Common services"></div>
+      <div class="chips" id="chips" aria-label="Popular"></div>
     </div>
 
     <div id="result" aria-live="polite"></div>
 
-    <div class="emerg"><strong>Emergency?</strong> Go to the nearest hospital first. Emergency stabilisation is covered on every plan, for 24 to 96 hours depending on your plan.</div>
+    <div class="banner error"><span class="ms">emergency</span><span><strong>Emergency?</strong> Go to the nearest hospital. Stabilisation is covered on every plan.</span></div>
   </section>
 
-  <section id="view-insights" hidden style="display:flex;flex-direction:column;gap:18px">
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <h2>What enrollees are asking</h2>
-      <p class="muted" id="sourceNote">Every check is logged anonymously: the words typed, the plan and the answer given. No names or member numbers.</p>
+  <section id="view-insights" class="view" hidden>
+    <div class="hero">
+      <h1>Insights</h1>
+      <p id="sourceNote">What enrollees ask. Anonymous.</p>
     </div>
-    <form class="panel" id="keyForm" hidden autocomplete="off">
-      <div class="field"><label for="staffKey">Staff key</label>
-      <div class="searchrow"><input type="password" id="staffKey" placeholder="Ask your admin for the key"><button class="primary" type="submit">Open insights</button></div>
-      <span class="note" id="keyMsg"></span></div>
-    </form>
-    <div class="panel" id="staffTools" hidden>
-      <div class="row">
-        <label for="days">Period</label>
-        <select id="days" style="width:auto"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="366">Last 12 months</option></select>
-        <label for="chan">Who</label>
-        <select id="chan" style="width:auto"><option value="">Everyone</option><option value="enrollee">Enrollees</option><option value="agent">Call centre agents</option></select>
+
+    <form class="card" id="keyForm" hidden autocomplete="off">
+      <div class="tf">
+        <span class="ms">key</span>
+        <label for="staffKey">Staff key</label>
+        <input type="password" id="staffKey">
       </div>
-      <div class="row"><button type="button" id="csvBtn">Download CSV</button><button type="button" id="logoutBtn">Sign out</button><span class="note" id="csvNote"></span></div>
+      <div class="actions"><button class="btn filled" type="submit"><span class="ms">lock_open</span>Open</button><span class="note" id="keyMsg"></span></div>
+    </form>
+
+    <div class="card" id="staffTools" hidden>
+      <div class="fields">
+        <div class="tf"><span class="ms">date_range</span><label for="days">Period</label>
+          <select id="days"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="366">Last 12 months</option></select><span class="ms arrow">arrow_drop_down</span></div>
+        <div class="tf"><span class="ms">group</span><label for="chan">Who</label>
+          <select id="chan"><option value="">Everyone</option><option value="enrollee">Enrollees</option><option value="agent">Agents</option></select><span class="ms arrow">arrow_drop_down</span></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn tonal" id="csvBtn"><span class="ms">download</span>CSV</button>
+        <button type="button" class="btn text" id="logoutBtn"><span class="ms">logout</span>Sign out</button>
+        <span class="note" id="csvNote"></span>
+      </div>
     </div>
+
     <div class="stats" id="stats"></div>
-    <div class="panel"><h3>Most-checked services</h3><div class="bars" id="topServices"></div></div>
-    <div class="panel"><h3>Questions the page couldn't answer</h3><p class="note">Gaps in the plan wording or the service list. Each one is a likely call-centre call.</p><div id="unanswered"></div></div>
-    <div class="panel"><h3>Checks that hit a "not covered" answer</h3><p class="note">Services enrollees want but their plan excludes. Useful for plan design and upgrade conversations.</p><div class="bars" id="notCovered"></div></div>
-    <div class="panel"><h3>Recent checks</h3><div class="tablewrap" id="recent"></div></div>
-    <div class="row">
-      <button type="button" id="sampleBtn">Load sample activity for a presentation</button>
-      <span class="note">Adds clearly marked sample checks to this screen only. Nothing is saved.</span>
-    </div>
+    <div class="card"><div class="card-title"><span class="ms">trending_up</span><h3>Top services</h3></div><div class="bars" id="topServices"></div></div>
+    <div class="card"><div class="card-title"><span class="ms">search_off</span><h3>No match</h3></div><div id="unanswered"></div></div>
+    <div class="card"><div class="card-title"><span class="ms">block</span><h3>Not covered</h3></div><div class="bars" id="notCovered"></div></div>
+    <div class="card"><div class="card-title"><span class="ms">history</span><h3>Recent</h3></div><div class="tablewrap" id="recent"></div></div>
+    <div class="actions"><button type="button" class="btn outlined" id="sampleBtn"><span class="ms">science</span>Demo data</button><span class="note">Screen only. Not saved.</span></div>
   </section>
 
   <footer id="foot"></footer>
-</div>
+</main>
+<div class="snackbar" id="snackbar" role="status"></div>
 
 <script>
 fetch("/plans.json").then(r=>r.json()).then(DATA=>{
@@ -182,7 +307,10 @@ function sessionId(){
 }
 const PLANS = DATA.plans.map(n=>({id:n.toLowerCase().replace(/\s+/g,"-"), name:n}));
 const SERVICES = DATA.services;
-const STATUS_TEXT = {ok:"Covered", lim:"Covered, with a limit", no:"Not covered", gap:"Not stated in the schedule", unk:"We couldn't find this"};
+const STATUS_TEXT = {ok:"Covered", lim:"Covered, with limit", no:"Not covered", gap:"Not in schedule", unk:"No match"};
+const STATUS_ICON = {ok:"check_circle", lim:"info", no:"cancel", gap:"help", unk:"search_off"};
+const ms = (name, cls="") => `<span class="ms ${cls}">${name}</span>`;
+function snack(msg){ const el=$("snackbar"); el.textContent=msg; el.classList.add("show"); clearTimeout(snack.t); snack.t=setTimeout(()=>el.classList.remove("show"),2600); }
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -191,7 +319,7 @@ const tierOf = id => Math.max(0, PLANS.findIndex(p=>p.id===id));
 const byId = id => SERVICES.find(s=>s.id===id);
 function forPlan(s, plan){ const [status, text] = s.v[tierOf(plan)]; return {status, text}; }
 
-$("foot").innerHTML = `<p>Coverage answers are a guide based on the 2026 plan schedule. The final decision rests with ProHealth.</p><p>${DATA.notes.filter(n=>!/premium/i.test(n)).map(esc).join(" · ")}</p>`;
+$("foot").innerHTML = `<p>A guide based on the 2026 schedule. ProHealth makes the final decision.</p><details><summary>Plan notes</summary><p>${DATA.notes.filter(n=>!/premium/i.test(n)).map(esc).join(" · ")}</p></details>`;
 
 // ---------- Matching ----------
 // Filler words carry no meaning for matching: "does my plan cover an MRI" should match on "mri" only.
@@ -233,7 +361,8 @@ $("plan").addEventListener("change", ()=>{ try{localStorage.setItem("prohealth-p
 const CHIPS = ["Antenatal Care","Caesarian section","MRI","Scaling & Polishing","Provision of lenses","Kidney dialysis","Access to gyms"]
   .map(t=>SERVICES.find(s=>s.name.toLowerCase().startsWith(t.toLowerCase()))).filter(Boolean);
 const chipLabel = s => s.name.replace(/\s*\(.*$/,"").replace("Caesarian section C/S","Caesarean section").replace("Access to gyms for regular exercise","Gym access");
-$("chips").innerHTML = CHIPS.map(s=>`<button type="button" class="chip" data-id="${s.id}">${esc(chipLabel(s))}</button>`).join("");
+const CHIP_ICON = s => /antenatal/i.test(s.name)?"pregnant_woman":/caesar/i.test(s.name)?"child_care":/mri/i.test(s.name)?"biotech":/scaling/i.test(s.name)?"dentistry":/lens/i.test(s.name)?"visibility":/dialysis/i.test(s.name)?"water_drop":/gym/i.test(s.name)?"fitness_center":"medical_services";
+$("chips").innerHTML = CHIPS.map(s=>`<button type="button" class="chip" data-id="${s.id}">${ms(CHIP_ICON(s))}${esc(chipLabel(s))}</button>`).join("");
 $("chips").addEventListener("click", e=>{ const b=e.target.closest("button[data-id]"); if(!b) return; const s=byId(b.dataset.id); $("q").value=chipLabel(s); $("suggest").hidden=true; show(s, chipLabel(s), true, "chip"); });
 
 $("q").addEventListener("input", ()=>{
@@ -245,47 +374,47 @@ $("suggest").addEventListener("click", e=>{ const b=e.target.closest("button[dat
 $("searchForm").addEventListener("submit", e=>{ e.preventDefault(); const q=$("q").value.trim(); if(!q) return; $("suggest").hidden=true; show(bestMatches(q)[0]||null, q, true, "search"); });
 
 let lastShown=null;
+// Limit text worth showing: skip it when it only repeats the badge ("Covered", "Not covered").
+const extra = r => !/^(covered|not covered|not stated in the schedule)$/i.test(r.text.trim());
 function show(s, typed, log, method="search"){
   const plan=$("plan").value, pn=planName(plan); lastShown={s, q:typed};
   if(!s){
-    $("result").innerHTML = `<div class="result"><div class="verdict unk"><span class="pill unk">${STATUS_TEXT.unk}</span>
-      <h2>No answer for "${esc(typed)}" yet</h2>
-      <p>Call ProHealth before you go, or ask the hospital to confirm with ProHealth. We've noted this question so the plan guide can be improved.</p></div>${log?feedbackBox():""}</div>`;
+    $("result").innerHTML = `<div class="result"><div class="verdict unk">${ms(STATUS_ICON.unk,"fill")}<div class="vtext">
+      <span class="label">${STATUS_TEXT.unk}</span><h2>“${esc(typed)}”</h2><p>Call ProHealth to confirm. We've noted it.</p></div></div>${log?feedbackBox():""}</div>`;
     if(log) record({q:typed, service:null, status:"unk", plan, method});
     return;
   }
   const r = forPlan(s, plan);
-  const lead = r.status==="ok" ? `Your ${pn} plan covers this. Show your ProHealth ID at the desk.`
-    : r.status==="lim" ? `Your ${pn} plan covers this up to the limit shown below.`
-    : r.status==="no" ? `Your ${pn} plan does not cover this. Any cost would be paid by you unless ProHealth approves otherwise.`
-    : `The plan schedule doesn't say whether ${pn} covers this. Call ProHealth before treatment.`;
+  const lead = r.status==="ok" ? `On your ${pn} plan.`
+    : r.status==="lim" ? `On your ${pn} plan, up to the limit.`
+    : r.status==="no" ? `Not on your ${pn} plan.`
+    : `The schedule is silent for ${pn}. Call ProHealth.`;
   const covered = r.status==="ok" || r.status==="lim";
+  const title = s.name.replace(/\s*\(.*$/,"").split(",")[0].trim();
   const lim = r.text.charAt(0).toLowerCase()+r.text.slice(1);
-  const say = covered ? `I'm on the ProHealth ${pn} plan. ${s.name} is covered on my plan${r.status==="lim"?` (${lim})`:""}. Please confirm with ProHealth if a pre-authorisation code is needed before treatment.` : "";
-  const docs = ["ProHealth ID card or enrollee number"];
-  if(/referral/i.test(s.name+" "+(s.detail||"")+" "+s.sec)) docs.push("Referral letter from your primary clinic");
-  if(/maternity|family/i.test(s.sec+" "+s.secnote)) docs.push("Antenatal card, if you have one");
+  const say = covered ? `I'm on the ProHealth ${pn} plan. ${title} is covered${r.status==="lim"?` (${lim})`:""}. Please confirm if a PA code is needed.` : "";
+  const docs = [["id_card","ProHealth ID"]];
+  if(/referral/i.test(s.name+" "+(s.detail||"")+" "+s.sec)) docs.push(["description","Referral letter"]);
+  if(/maternity|family/i.test(s.sec+" "+s.secnote)) docs.push(["pregnant_woman","Antenatal card"]);
   $("result").innerHTML = `<div class="result">
-    <div class="verdict ${r.status}"><span class="pill ${r.status}">${STATUS_TEXT[r.status]}</span><h2>${esc(s.name)}</h2><p>${esc(lead)}</p></div>
-    <dl class="facts" style="margin:0">
-      <div class="fact"><dt>Plan</dt><dd>${esc(pn)}</dd></div>
-      <div class="fact"><dt>On your plan</dt><dd>${esc(r.text)}</dd></div>
-      <div class="fact"><dt>Benefit section</dt><dd>${esc(s.sec)}${s.secnote?`<br><span class="note">Applies to: ${esc(s.secnote)}</span>`:""}</dd></div>
-    </dl>
-    ${s.detail?`<div class="desk"><h3>What the schedule says</h3><p class="note" style="color:var(--ink)">${esc(s.detail)}</p></div>`:""}
-    <div class="desk">
-      <h3>${esc(s.name.replace(/\s*\(.*$/,""))} on every plan</h3>
-      <div class="tablewrap"><table><tbody>${PLANS.map(p=>{const x=forPlan(s,p.id);return `<tr${p.id===plan?' style="font-weight:600"':''}><td>${esc(p.name)}${p.id===plan?' (yours)':''}</td><td><span class="tag ${x.status}">${STATUS_TEXT[x.status]}</span></td><td class="q">${esc(x.text)}</td></tr>`}).join("")}</tbody></table></div>
+    <div class="verdict ${r.status}">${ms(STATUS_ICON[r.status],"fill")}<div class="vtext">
+      <span class="label">${STATUS_TEXT[r.status]}</span><h2>${esc(s.name)}</h2><p>${esc(lead)}</p></div></div>
+    <div class="sect"><div class="list">
+      ${extra(r)?`<div class="li">${ms("payments")}<div class="lt"><span class="over">Your limit</span><span>${esc(r.text)}</span></div></div>`:""}
+      <div class="li">${ms("category")}<div class="lt"><span class="over">Section</span><span>${esc(s.sec)}${s.secnote?` · ${esc(s.secnote)}`:""}</span></div></div>
     </div>
-    ${covered?`<div class="desk">
-      <h3>What to bring</h3><ol>${docs.map(d=>`<li>${esc(d)}</li>`).join("")}</ol>
-      <h3>What to say at the hospital desk</h3>
-      <p class="say" id="sayText">${esc(say)}</p>
-      <div class="row"><button type="button" id="copyBtn">Copy what to say</button><span class="note" id="copyNote">Or take a screenshot of this card.</span></div>
-    </div>`:""}${log?feedbackBox():""}</div>`;
+    ${s.detail?`<details class="more"><summary>Schedule wording ${ms("expand_more","sm")}</summary><p>${esc(s.detail)}</p></details>`:""}</div>
+    ${covered?`<div class="sect"><h3>At the desk</h3>
+      <div class="bring">${docs.map(([i,d])=>`<span>${ms(i)}${esc(d)}</span>`).join("")}</div>
+      <div class="say"><p id="sayText">${esc(say)}</p><button type="button" class="iconbtn" id="copyBtn" aria-label="Copy">${ms("content_copy")}</button></div>
+      <span class="note" id="copyNote" hidden></span></div>`:""}
+    <div class="sect"><h3>All plans</h3>
+      <div class="plans">${PLANS.map(p=>{const x=forPlan(s,p.id);return `<div class="planrow${p.id===plan?" mine":""}"><span>${esc(p.name)}</span><span class="tag ${x.status}">${STATUS_TEXT[x.status]}</span><span class="pt">${extra(x)?esc(x.text):""}</span></div>`}).join("")}</div>
+    </div>
+    ${log?feedbackBox():""}</div>`;
   if(covered) $("copyBtn").addEventListener("click", ()=>{
-    const fallback=()=>{ const rg=document.createRange(); rg.selectNodeContents($("sayText")); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(rg); $("copyNote").textContent="Text selected. Copy it from your menu."; };
-    try{ navigator.clipboard.writeText(say).then(()=>{$("copyNote").textContent="Copied."}).catch(fallback); }catch(e){ fallback(); }
+    const fallback=()=>{ const rg=document.createRange(); rg.selectNodeContents($("sayText")); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(rg); snack("Selected. Copy from your menu."); };
+    try{ navigator.clipboard.writeText(say).then(()=>snack("Copied")).catch(fallback); }catch(e){ fallback(); }
   });
   if(log) record({q:typed, service:s.id, service_name:s.name, section:s.sec, answer:r.text, status:r.status, plan, method});
 }
@@ -303,15 +432,16 @@ function record(entry){
 
 // "Was this helpful?" under each answer
 function feedbackBox(){
-  return `<div class="desk" id="fb"><div class="row"><span>Was this answer helpful?</span>
-    <button type="button" data-helpful="true">Yes</button><button type="button" data-helpful="false">No</button></div>
-    <span class="note" id="fbNote"></span></div>`;
+  return `<div class="sect" id="fb"><div class="fbrow"><span>Helpful?</span>
+    <button type="button" class="iconbtn" data-helpful="true" aria-label="Yes">${ms("thumb_up")}</button>
+    <button type="button" class="iconbtn" data-helpful="false" aria-label="No">${ms("thumb_down")}</button></div>
+    <span class="note" id="fbNote" hidden></span></div>`;
 }
 $("result").addEventListener("click", async e => {
   const b = e.target.closest("button[data-helpful]"); if(!b) return;
   const helpful = b.dataset.helpful === "true";
-  $("fb").querySelectorAll("button").forEach(x => x.disabled = true);
-  $("fbNote").textContent = "Thank you for the feedback.";
+  $("fb").querySelectorAll("button").forEach(x => { x.disabled = true; if(x===b) x.setAttribute("aria-pressed","true"); });
+  snack("Thanks for the feedback");
   const id = await lastCheck;
   if(id) fetch(`${API_BASE}/api/checks/${id}/feedback`, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({helpful}), keepalive:true}).catch(()=>{});
 });
@@ -323,25 +453,25 @@ let summary=null;
 async function loadInsights(){
   const key = getKey();
   summary = null;
-  if(!key){ $("keyForm").hidden=false; $("staffTools").hidden=true; $("sourceNote").textContent="Enter the staff key to see what enrollees are asking. Until then, this shows checks made on this screen only."; rows=localRows; renderInsights(); return; }
-  $("sourceNote").textContent="Loading shared activity. The first load can take up to a minute if the service has been idle.";
+  if(!key){ $("keyForm").hidden=false; $("staffTools").hidden=true; $("sourceNote").textContent="Enter the staff key."; rows=localRows; renderInsights(); return; }
+  $("sourceNote").textContent="Loading…";
   try{
     const qs = new URLSearchParams({days: $("days").value}); if($("chan").value) qs.set("channel", $("chan").value);
     const res = await fetch(`${API_BASE}/api/insights?${qs}`, {headers:{"X-Staff-Key":key}});
-    if(res.status===401){ dropKey(); $("keyForm").hidden=false; $("staffTools").hidden=true; $("keyMsg").textContent="That key didn't work. Check it with your admin and try again."; rows=localRows; renderInsights(); return; }
+    if(res.status===401){ dropKey(); $("keyForm").hidden=false; $("staffTools").hidden=true; $("keyMsg").textContent="Wrong key. Try again."; rows=localRows; renderInsights(); return; }
     if(!res.ok) throw new Error();
     const data = await res.json();
-    if(data.configured===false){ rows=localRows; $("keyForm").hidden=true; $("staffTools").hidden=true; $("sourceNote").textContent="The database isn't connected yet, so this shows checks made on this screen only. Connect Neon in Vercel (Storage tab) and redeploy."; renderInsights(); return; }
+    if(data.configured===false){ rows=localRows; $("keyForm").hidden=true; $("staffTools").hidden=true; $("sourceNote").textContent="Database not connected. Showing this screen only."; renderInsights(); return; }
     rows = data.rows||[]; summary = data.summary||null; $("keyForm").hidden=true; $("staffTools").hidden=false;
-    $("sourceNote").textContent = `Shared activity for the last ${data.period_days} days${data.channel!=="all"?`, ${data.channel} checks only`:""}. Every check is logged anonymously: the words typed, the plan and the answer given. No names or member numbers.`;
-  }catch(e){ rows=localRows; $("sourceNote").textContent="Couldn't reach the insights service. Showing checks made on this screen only."; }
+    $("sourceNote").textContent = `Last ${data.period_days} days${data.channel!=="all"?` · ${data.channel}s`:""} · anonymous`;
+  }catch(e){ rows=localRows; $("sourceNote").textContent="Can't reach the server. Showing this screen only."; }
   renderInsights();
 }
 $("keyForm").addEventListener("submit", e=>{ e.preventDefault(); const k=$("staffKey").value.trim(); if(!k) return; setKey(k); $("keyMsg").textContent=""; loadInsights(); });
 $("days").addEventListener("change", loadInsights);
 $("chan").addEventListener("change", loadInsights);
 $("csvBtn").addEventListener("click", async ()=>{
-  $("csvNote").textContent="Preparing the file…";
+  $("csvNote").textContent="";
   try{
     const qs = new URLSearchParams({days: $("days").value}); if($("chan").value) qs.set("channel", $("chan").value);
     const res = await fetch(`${API_BASE}/api/export.csv?${qs}`, {headers:{"X-Staff-Key":getKey()}});
@@ -349,8 +479,8 @@ $("csvBtn").addEventListener("click", async ()=>{
     const url = URL.createObjectURL(await res.blob());
     const a = document.createElement("a"); a.href=url; a.download=`coverage-checks-last-${$("days").value}-days.csv`; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url), 5000);
-    $("csvNote").textContent="Downloaded.";
-  }catch(e){ $("csvNote").textContent="Couldn't download the file. Check the staff key and try again."; }
+    snack("Downloaded");
+  }catch(e){ snack("Download failed"); }
 });
 $("logoutBtn").addEventListener("click", ()=>{ dropKey(); $("staffKey").value=""; loadInsights(); });
 
@@ -366,22 +496,22 @@ function renderInsights(){
   const all = [...sampleRows, ...rows];
   const total = all.length, unk = all.filter(r=>r.status==="unk").length, no = all.filter(r=>r.status==="no").length;
   const pct = n => total ? Math.round(n/total*100)+"%" : "0%";
-  const helpful = summary && summary.helpful_rate!=null && !sampleRows.length ? [summary.helpful_rate+"%","found the answer helpful"] : null;
-  const visitors = summary && !sampleRows.length ? [summary.visitors,"unique visitors"] : null;
-  $("stats").innerHTML = [[total,"checks logged"],[pct(total-unk),"answered by the page"],[unk,"couldn't be answered"],[no,"got a not-covered answer"], visitors, helpful].filter(Boolean)
+  const helpful = summary && summary.helpful_rate!=null && !sampleRows.length ? [summary.helpful_rate+"%","Helpful"] : null;
+  const visitors = summary && !sampleRows.length ? [summary.visitors,"Visitors"] : null;
+  $("stats").innerHTML = [[total,"Checks"],[pct(total-unk),"Answered"],[unk,"No match"],[no,"Not covered"], visitors, helpful].filter(Boolean)
     .map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
-  $("topServices").innerHTML = bars(count(all, r=>r.service?nameOf(r.service):null), "", "No checks yet. Try a few on the Check coverage tab, or load sample activity below.");
-  $("notCovered").innerHTML = bars(count(all.filter(r=>r.status==="no"), r=>`${nameOf(r.service)} (${planName(r.plan)})`), "pa", "No not-covered answers yet.");
+  $("topServices").innerHTML = bars(count(all, r=>r.service?nameOf(r.service):null), "", "No checks yet.");
+  $("notCovered").innerHTML = bars(count(all.filter(r=>r.status==="no"), r=>`${nameOf(r.service)} (${planName(r.plan)})`), "pa", "None yet.");
   const un = count(all.filter(r=>r.status==="unk"), r=>r.q.toLowerCase());
-  $("unanswered").innerHTML = un.length ? `<div class="bars">${bars(un,"unk","")}</div>` : `<div class="empty">Nothing unanswered yet. Questions the page can't match will appear here.</div>`;
+  $("unanswered").innerHTML = un.length ? `<div class="bars">${bars(un,"unk","")}</div>` : `<div class="empty">None yet.</div>`;
   const recent = all.slice().sort((a,b)=>b.ts-a.ts).slice(0,12);
-  $("recent").innerHTML = recent.length ? `<table><thead><tr><th>When</th><th>Typed</th><th>Plan</th><th>Answer</th></tr></thead><tbody>${
-    recent.map(r=>`<tr><td>${new Date(r.ts).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}${r.sample?' <span class="tag gap">sample</span>':''}</td><td class="q">${esc(r.q)}</td><td>${esc(planName(r.plan))}</td><td><span class="tag ${r.status}">${STATUS_TEXT[r.status]}</span></td></tr>`).join("")
+  $("recent").innerHTML = recent.length ? `<table><thead><tr><th>When</th><th>Search</th><th>Plan</th><th>Result</th></tr></thead><tbody>${
+    recent.map(r=>`<tr><td>${new Date(r.ts).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}${r.sample?' <span class="tag gap">demo</span>':''}</td><td class="q">${esc(r.q)}</td><td>${esc(planName(r.plan))}</td><td><span class="tag ${r.status}">${STATUS_TEXT[r.status]}</span></td></tr>`).join("")
   }</tbody></table>` : `<div class="empty">No checks yet.</div>`;
 }
 
 $("sampleBtn").addEventListener("click", ()=>{
-  if(sampleRows.length){ sampleRows=[]; $("sampleBtn").textContent="Load sample activity for a presentation"; renderInsights(); return; }
+  if(sampleRows.length){ sampleRows=[]; $("sampleBtn").innerHTML=ms("science")+"Demo data"; renderInsights(); return; }
   const qs = [["antenatal",6],["caesarean",4],["mri",5],["scaling",4],["glasses",4],["dialysis",3],["gym",2],["root canal",3],["ct scan",2],["hypertension",2],["mammogram",2],["does my plan cover ivf",2],["can i change my hospital",2],["is my wife covered",2],["covid test",1]];
   const now=Date.now(); let i=0;
   for(const [q,n] of qs) for(let k=0;k<n;k++){
@@ -390,7 +520,7 @@ $("sampleBtn").addEventListener("click", ()=>{
     sampleRows.push({q, service:s?s.id:null, status: /ivf|hospital|wife|covid/.test(q)?"unk":st, plan:pl, ts:now-(i++)*3.7e6, sample:true});
   }
   sampleRows.forEach(r=>{ if(r.status==="unk") r.service=null; });
-  $("sampleBtn").textContent="Remove sample activity"; renderInsights();
+  $("sampleBtn").innerHTML=ms("close")+"Clear demo"; renderInsights();
 });
 
 // ---------- Routing ----------
@@ -402,6 +532,7 @@ function route(){
   if(v==="insights") loadInsights();
 }
 addEventListener("hashchange", route);
+addEventListener("scroll", ()=>$("appbar").classList.toggle("scrolled", scrollY>4), {passive:true});
 route();
 const ex = CHIPS.find(s=>/Scaling/.test(s.name)) || SERVICES[0]; $("q").value = chipLabel(ex); show(ex, ex.name, false);
 });
