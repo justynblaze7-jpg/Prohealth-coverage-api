@@ -272,6 +272,7 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
       </div>
     </div>
 
+    <div class="view" id="insightsBody" hidden>
     <div class="stats" id="stats"></div>
 
     <div class="group"><span class="ghead">Most-checked services</span><div class="card"><div class="bars" id="topServices"></div></div></div>
@@ -282,6 +283,7 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
     <div class="group">
       <div><button type="button" class="btn gray" id="sampleBtn">Load sample activity for a presentation</button></div>
       <span class="gfoot">Adds clearly marked sample checks to this screen only. Nothing is saved.</span>
+    </div>
     </div>
   </section>
 
@@ -443,21 +445,28 @@ function getKey(){ try{ return sessionStorage.getItem("staffKey")||""; }catch(e)
 function setKey(k){ try{ sessionStorage.setItem("staffKey",k); }catch(e){ window.__staffKey=k; } }
 function dropKey(){ try{ sessionStorage.removeItem("staffKey"); }catch(e){} window.__staffKey=""; }
 let summary=null;
+// Without a valid key nothing is shown: no stats, no lists, no sample data.
+function lockInsights(note){
+  rows=[]; summary=null; sampleRows=[]; $("sampleBtn").textContent="Load sample activity for a presentation";
+  ["stats","topServices","unanswered","notCovered","recent"].forEach(id=>$(id).innerHTML="");
+  $("insightsBody").hidden=true; $("staffTools").hidden=true; $("keyForm").hidden=false; $("sourceNote").textContent=note;
+}
 async function loadInsights(){
   const key = getKey();
   summary = null;
-  if(!key){ $("keyForm").hidden=false; $("staffTools").hidden=true; $("sourceNote").textContent="Enter the staff key to see what enrollees are asking. Until then, this shows checks made on this screen only."; rows=localRows; renderInsights(); return; }
+  if(!key){ lockInsights("Enter the staff key to see what enrollees are asking."); return; }
   $("sourceNote").textContent="Loading shared activity. The first load can take up to a minute if the service has been idle.";
   try{
     const qs = new URLSearchParams({days: $("days").value}); if($("chan").value) qs.set("channel", $("chan").value);
     const res = await fetch(`${API_BASE}/api/insights?${qs}`, {headers:{"X-Staff-Key":key}});
-    if(res.status===401){ dropKey(); $("keyForm").hidden=false; $("staffTools").hidden=true; $("keyMsg").textContent="That key didn't work. Check it with your admin and try again."; rows=localRows; renderInsights(); return; }
+    if(res.status===401){ dropKey(); lockInsights("Enter the staff key to see what enrollees are asking."); $("keyMsg").textContent="That key didn't work. Check it with your admin and try again."; return; }
     if(!res.ok) throw new Error();
     const data = await res.json();
     if(data.configured===false){ rows=localRows; $("keyForm").hidden=true; $("staffTools").hidden=true; $("sourceNote").textContent="The database isn't connected yet, so this shows checks made on this screen only. Connect Neon in Vercel (Storage tab) and redeploy."; renderInsights(); return; }
     rows = data.rows||[]; summary = data.summary||null; $("keyForm").hidden=true; $("staffTools").hidden=false;
     $("sourceNote").textContent = `Shared activity for the last ${data.period_days} days${data.channel!=="all"?`, ${data.channel} checks only`:""}. Every check is logged anonymously: the words typed, the plan and the answer given. No names or member numbers.`;
   }catch(e){ rows=localRows; $("sourceNote").textContent="Couldn't reach the insights service. Showing checks made on this screen only."; }
+  $("insightsBody").hidden=false;
   renderInsights();
 }
 $("keyForm").addEventListener("submit", e=>{ e.preventDefault(); const k=$("staffKey").value.trim(); if(!k) return; setKey(k); $("keyMsg").textContent=""; loadInsights(); });
@@ -486,6 +495,7 @@ function bars(entries, cls, empty){
 }
 const nameOf = id => (byId(id)||{}).name || "Unknown service";
 function renderInsights(){
+  $("insightsBody").hidden=false;
   const all = [...sampleRows, ...rows];
   const total = all.length, unk = all.filter(r=>r.status==="unk").length, no = all.filter(r=>r.status==="no").length;
   const pct = n => total ? Math.round(n/total*100)+"%" : "0%";
