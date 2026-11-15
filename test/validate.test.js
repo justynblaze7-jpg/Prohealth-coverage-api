@@ -61,3 +61,11 @@ test("parseCheck takes the organisation from the server's list, not the browser"
   assert.equal(none.org_id, null);
   assert.equal(none.org_name, null);
 });
+
+test("parseCheck keeps the time an offline check was made, within limits", () => {
+  const t = Date.now() - 3 * 864e5;
+  assert.equal(parseCheck({ q: "mri", plan: "ruby", status: "unk", ts: t }, "").row.created_at, new Date(t).toISOString());
+  assert.equal("created_at" in parseCheck({ q: "mri", plan: "ruby", status: "unk", ts: Date.now() + 864e5 }, "").row, false);
+  assert.equal("created_at" in parseCheck({ q: "mri", plan: "ruby", status: "unk", ts: Date.now() - 60 * 864e5 }, "").row, false);
+  assert.equal("created_at" in parseCheck({ q: "mri", plan: "ruby", status: "unk" }, "").row, false);
+});
