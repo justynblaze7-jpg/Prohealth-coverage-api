@@ -195,7 +195,7 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,su
 .hb.other{background:var(--gray)}
 .hv{font-size:.8125rem;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;min-width:3.8em}
 .hv b{font-size:.9375rem;color:var(--label)}.hv span{color:var(--label-2)}
-.stack{display:flex;gap:2px;height:18px}
+.wstack{display:flex;gap:2px;height:18px}
 .seg{display:block;height:18px}.seg:last-child{border-radius:0 4px 4px 0}
 .seg.short{background:var(--c-short)}.seg.okk{background:var(--c-ok);opacity:.55}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 16px 0;font-size:.8125rem;color:var(--label-2)}
@@ -759,7 +759,7 @@ function stackbars(id, rows, empty, keep=8){
   $(id).innerHTML = `<div class="legend"><span><i class="sw short"></i>Not covered or no answer</span><span><i class="sw okk"></i>Answered</span></div>
     <div class="hbars">${list.map(r => `<div class="hrow" tabindex="0" data-tip="${esc(r.label)}: ${r.short} of ${r.total} checks fell short (${pct(r.short,r.total)}%)">
       <span class="hl">${esc(r.label)}</span>
-      <span class="ht"><span class="stack" style="width:${Math.max(4, r.total / max * 100)}%"><span class="seg short" style="flex:${r.short}"></span>${r.total-r.short ? `<span class="seg okk" style="flex:${r.total-r.short}"></span>` : ""}</span></span>
+      <span class="ht"><span class="wstack" style="width:${Math.max(4, r.total / max * 100)}%"><span class="seg short" style="flex:${r.short}"></span>${r.total-r.short ? `<span class="seg okk" style="flex:${r.total-r.short}"></span>` : ""}</span></span>
       <span class="hv"><b>${pct(r.short,r.total)}%</b> <span>${r.short}/${r.total}</span></span></div>`).join("")}</div>
     ${rows.length > keep ? `<div class="note" style="padding:0 16px 12px">${rows.length - keep} more organisation${rows.length-keep===1?"":"s"} in the CSV download.</div>` : ""}`;
 }
