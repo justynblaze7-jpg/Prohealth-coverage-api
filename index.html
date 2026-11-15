@@ -175,6 +175,35 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,su
 .alertbox{display:flex;gap:12px;align-items:flex-start;background:var(--red-bg);border:1px solid color-mix(in srgb,var(--red) 25%,transparent);color:var(--label);border-radius:12px;padding:14px 16px;font-size:.9375rem}
 .alertbox .ic{color:var(--red);margin-top:2px}
 
+/* Charts */
+:root{--c-bar:#26176a;--c-short:#d0461a;--c-ok:#5b4fb0;--c-track:rgba(118,118,128,.1)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--c-bar:#8e80f0;--c-short:#e0702a;--c-ok:#8e80f0}}
+:root[data-theme="dark"]{--c-bar:#8e80f0;--c-short:#e0702a;--c-ok:#8e80f0}
+.hbars{display:flex;flex-direction:column;gap:4px;padding:12px 16px}
+.hrow{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr) auto;align-items:center;gap:10px;min-height:32px;border-radius:6px;outline-offset:2px}
+.hrow:hover .hb,.hrow:focus .hb{filter:brightness(1.15)}
+.hl{font-size:.875rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ht{height:18px;display:flex;align-items:center}
+.hb{display:block;height:18px;background:var(--c-bar);border-radius:0 4px 4px 0}
+.hb.other{background:var(--gray)}
+.hv{font-size:.8125rem;white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;min-width:3.8em}
+.hv b{font-size:.9375rem;color:var(--label)}.hv span{color:var(--label-2)}
+.stack{display:flex;gap:2px;height:18px}
+.seg{display:block;height:18px}.seg:last-child{border-radius:0 4px 4px 0}
+.seg.short{background:var(--c-short)}.seg.okk{background:var(--c-ok);opacity:.55}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 16px 0;font-size:.8125rem;color:var(--label-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}.sw.short{background:var(--c-short)}.sw.okk{background:var(--c-ok);opacity:.55}
+.cols{display:grid;gap:6px;padding:16px 12px 12px;align-items:end}
+.col{display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:6px;outline-offset:2px}
+.cv{display:flex;flex-direction:column;align-items:center;font-variant-numeric:tabular-nums;line-height:1.15;min-height:2.3em;justify-content:flex-end}
+.cv b{font-size:1rem}.cv span{font-size:.75rem;color:var(--label-2)}
+.cp{height:140px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-bottom:1px solid var(--sep)}
+.cb{width:min(24px,70%);background:var(--c-bar);border-radius:4px 4px 0 0;display:block}
+.col:hover .cb,.col:focus .cb{filter:brightness(1.15)}
+.cl{font-size:.75rem;line-height:1.2;color:var(--label-2);text-align:center;min-height:2.4em}
+.tip{position:absolute;z-index:20;max-width:260px;padding:8px 10px;border-radius:8px;background:var(--label);color:var(--bg);font-size:.8125rem;line-height:1.35;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+@media (max-width:420px){.hrow{grid-template-columns:minmax(0,42%) minmax(0,1fr) auto;gap:8px}}
 /* Staff view */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .stat{background:var(--card);border:1px solid var(--edge);box-shadow:var(--raise);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
@@ -311,16 +340,25 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
     <div class="view" id="insightsBody" hidden>
     <div class="stats" id="stats"></div>
 
-    <div class="group"><span class="ghead">Most-checked services</span><div class="card"><div class="bars" id="topServices"></div></div></div>
-    <div class="group"><span class="ghead">Questions the page couldn't answer</span><div class="card" id="unanswered"></div><span class="gfoot">Gaps in the plan wording or the service list. Each one is a likely call-centre call.</span></div>
-    <div class="group"><span class="ghead">Checks that hit a "not covered" answer</span><div class="card"><div class="bars" id="notCovered"></div></div><span class="gfoot">Services enrollees want but their plan excludes. Useful for plan design and upgrade conversations.</span></div>
-    <div class="titlebox" style="padding-top:12px"><span class="eyebrow">By organisation</span><h2>Which organisations are asking</h2><p class="note" style="font-size:.9375rem">Based on the organisation enrollees pick on the form. Regions are Nigeria's geopolitical zones; state comes from each group's address.</p></div>
+    <div class="titlebox" style="padding-top:8px"><span class="eyebrow">By organisation</span><h2>Which organisations are asking</h2><p class="note" style="font-size:.9375rem">Based on the organisation enrollees pick on the form. Regions are Nigeria's geopolitical zones; state comes from each group's address.</p></div>
     <div class="stats" id="orgStats"></div>
-    <div class="group"><span class="ghead">Organisations with the most checks</span><div class="card"><div class="bars" id="topOrgs"></div></div></div>
-    <div class="group"><span class="ghead">Checks by region</span><div class="card"><div class="bars" id="byRegion"></div></div></div>
-    <div class="group"><span class="ghead">Checks by state</span><div class="card"><div class="bars" id="byState"></div></div></div>
-    <div class="group"><span class="ghead">Checks by sector</span><div class="card"><div class="bars" id="bySector"></div></div></div>
-    <div class="group"><span class="ghead">Where enrollees hit a wall</span><div class="card"><div class="bars" id="orgWalls"></div></div><span class="gfoot">Checks that ended in "not covered" or no answer, by organisation. Worth a call from the account manager or a quick HR briefing.</span></div>
+    <div class="group"><span class="ghead">Organisations with the most checks</span><div class="card"><div class="chart" id="topOrgs"></div></div></div>
+    <div class="group"><span class="ghead">Checks by region</span><div class="card"><div class="chart" id="byRegion"></div></div></div>
+    <div class="group"><span class="ghead">Checks by state</span><div class="card"><div class="chart" id="byState"></div></div></div>
+    <div class="group"><span class="ghead">Checks by sector</span><div class="card"><div class="chart" id="bySector"></div></div></div>
+    <div class="group"><span class="ghead">Where enrollees hit a wall</span><div class="card"><div class="chart" id="orgWalls"></div></div><span class="gfoot">Checks that ended in "not covered" or no answer, by organisation. Worth a call from the account manager or a quick HR briefing.</span></div>
+
+    <div class="group" id="svcTabs">
+      <div class="segmented tabs" role="tablist" aria-label="Services">
+        <button type="button" role="tab" id="t-top" aria-controls="p-top" aria-selected="true">Most checked</button>
+        <button type="button" role="tab" id="t-unans" aria-controls="p-unans" aria-selected="false" tabindex="-1">Couldn't answer</button>
+        <button type="button" role="tab" id="t-notcov" aria-controls="p-notcov" aria-selected="false" tabindex="-1">Not covered</button>
+      </div>
+      <div class="group" role="tabpanel" id="p-top" aria-labelledby="t-top"><span class="ghead">Most-checked services</span><div class="card"><div class="bars" id="topServices"></div></div></div>
+      <div class="group" role="tabpanel" id="p-unans" aria-labelledby="t-unans" hidden><span class="ghead">Questions the page couldn't answer</span><div class="card" id="unanswered"></div><span class="gfoot">Gaps in the plan wording or the service list. Each one is a likely call-centre call.</span></div>
+      <div class="group" role="tabpanel" id="p-notcov" aria-labelledby="t-notcov" hidden><span class="ghead">Checks that hit a "not covered" answer</span><div class="card"><div class="bars" id="notCovered"></div></div><span class="gfoot">Services enrollees want but their plan excludes. Useful for plan design and upgrade conversations.</span></div>
+    </div>
+
     <div class="group" id="moreTabs">
       <div class="segmented tabs" role="tablist" aria-label="More insights">
         <button type="button" role="tab" id="t-renew" aria-controls="p-renew" aria-selected="true">Policies ending</button>
@@ -341,6 +379,7 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
 
   <footer id="foot"></footer>
 </main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
 
 
 <script>
@@ -611,19 +650,15 @@ $("result").addEventListener("click", e => {
 });
 
 // ---------- Insights tabs ----------
-const TABS = ["renew","quiet","recent"];
-function showTab(name, focus){
-  TABS.forEach(t=>{ const on = t===name, tab=$("t-"+t);
-    tab.setAttribute("aria-selected", on); tab.tabIndex = on ? 0 : -1; $("p-"+t).hidden = !on; if(on && focus) tab.focus(); });
-  try{ sessionStorage.setItem("ph-tab", name); }catch(e){}
-}
-document.querySelector("#moreTabs [role=tablist]").addEventListener("click", e=>{ const b=e.target.closest("[role=tab]"); if(b) showTab(b.id.slice(2)); });
-document.querySelector("#moreTabs [role=tablist]").addEventListener("keydown", e=>{
-  if(e.key!=="ArrowRight" && e.key!=="ArrowLeft") return;
-  const i = TABS.findIndex(t=>$("t-"+t).getAttribute("aria-selected")==="true");
-  showTab(TABS[(i + (e.key==="ArrowRight"?1:TABS.length-1)) % TABS.length], true);
+document.querySelectorAll("[role=tablist]").forEach(list=>{
+  const tabs=[...list.querySelectorAll("[role=tab]")], key="ph-tab-"+list.parentElement.id;
+  const show=(tab, focus)=>{ tabs.forEach(t=>{ const on=t===tab; t.setAttribute("aria-selected", on); t.tabIndex=on?0:-1; $(t.getAttribute("aria-controls")).hidden=!on; });
+    if(focus) tab.focus(); try{ sessionStorage.setItem(key, tab.id); }catch(e){} };
+  list.addEventListener("click", e=>{ const t=e.target.closest("[role=tab]"); if(t) show(t); });
+  list.addEventListener("keydown", e=>{ if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft") return;
+    const i=tabs.findIndex(t=>t.getAttribute("aria-selected")==="true"); show(tabs[(i+(e.key==="ArrowRight"?1:tabs.length-1))%tabs.length], true); });
+  try{ const saved=$(sessionStorage.getItem(key)); if(saved && tabs.includes(saved)) show(saved); }catch(e){}
 });
-try{ const t = sessionStorage.getItem("ph-tab"); if(TABS.includes(t)) showTab(t); }catch(e){}
 
 function getKey(){ try{ return sessionStorage.getItem("staffKey")||""; }catch(e){ return window.__staffKey||""; } }
 function setKey(k){ try{ sessionStorage.setItem("staffKey",k); }catch(e){ window.__staffKey=k; } }
@@ -678,6 +713,64 @@ function bars(entries, cls, empty){
   return entries.slice(0,8).map(([k,n])=>`<div class="bar"><span>${esc(k)}</span><span class="n">${n}</span><div class="track"><div class="fill ${cls}" style="width:${Math.max(4,Math.round(n/max*100))}%"></div></div></div>`).join("");
 }
 const nameOf = id => (byId(id)||{}).name || "Unknown service";
+// ---------- Charts ----------
+// Horizontal bars for ranked lists, columns for the six regions, and a two-part bar for
+// "hit a wall". Every mark carries a tooltip (hover or keyboard focus); values are printed
+// at the bar end so nothing depends on colour alone.
+const pct = (n, t) => t ? Math.round(n / t * 100) : 0;
+function foldOther(entries, keep){
+  if(entries.length <= keep) return entries;
+  const rest = entries.slice(keep - 1);
+  return [...entries.slice(0, keep - 1), [`Other (${rest.length})`, rest.reduce((a, [, n]) => a + n, 0), true]];
+}
+// entries: [label, n, isOther?]; total: for the share shown beside each value
+function hbars(id, entries, total, empty, keep=10){
+  if(!entries.length){ $(id).innerHTML = `<div class="empty">${empty}</div>`; return; }
+  const list = foldOther(entries, keep), max = Math.max(...list.map(e => e[1]));
+  $(id).innerHTML = `<div class="hbars">${list.map(([label, n, other]) => {
+    const share = pct(n, total);
+    return `<div class="hrow" tabindex="0" data-tip="${esc(label)}: ${n} check${n===1?"":"s"} (${share}% of checks)">
+      <span class="hl">${esc(label)}</span>
+      <span class="ht"><span class="hb${other?" other":""}" style="width:${Math.max(2, n / max * 100)}%"></span></span>
+      <span class="hv"><b>${n}</b> <span>${share}%</span></span></div>`;
+  }).join("")}</div>`;
+}
+const REGIONS = ["North Central","North West","North East","South West","South South","South East"];
+function columns(id, counts, total, empty){
+  const m = new Map(counts); if(!total){ $(id).innerHTML = `<div class="empty">${empty}</div>`; return; }
+  const extra = counts.filter(([k]) => !REGIONS.includes(k));
+  const cols = [...REGIONS.map(r => [r, m.get(r) || 0]), ...extra];
+  const max = Math.max(1, ...cols.map(c => c[1]));
+  $(id).innerHTML = `<div class="cols" style="grid-template-columns:repeat(${cols.length},minmax(0,1fr))">${cols.map(([label, n]) =>
+    `<div class="col" tabindex="0" data-tip="${esc(label)}: ${n} check${n===1?"":"s"} (${pct(n,total)}%)">
+      <span class="cv">${n ? `<b>${n}</b><span>${pct(n,total)}%</span>` : `<span>0</span>`}</span>
+      <span class="cp"><span class="cb${n?"":" zero"}" style="height:${n ? Math.max(3, n / max * 100) : 0}%"></span></span>
+      <span class="cl">${esc(label).replace(" ", "<br>")}</span></div>`).join("")}</div>`;
+}
+// rows: {label, short, total}
+function stackbars(id, rows, empty, keep=8){
+  if(!rows.length){ $(id).innerHTML = `<div class="empty">${empty}</div>`; return; }
+  const list = rows.slice(0, keep), max = Math.max(...list.map(r => r.total));
+  $(id).innerHTML = `<div class="legend"><span><i class="sw short"></i>Not covered or no answer</span><span><i class="sw okk"></i>Answered</span></div>
+    <div class="hbars">${list.map(r => `<div class="hrow" tabindex="0" data-tip="${esc(r.label)}: ${r.short} of ${r.total} checks fell short (${pct(r.short,r.total)}%)">
+      <span class="hl">${esc(r.label)}</span>
+      <span class="ht"><span class="stack" style="width:${Math.max(4, r.total / max * 100)}%"><span class="seg short" style="flex:${r.short}"></span>${r.total-r.short ? `<span class="seg okk" style="flex:${r.total-r.short}"></span>` : ""}</span></span>
+      <span class="hv"><b>${pct(r.short,r.total)}%</b> <span>${r.short}/${r.total}</span></span></div>`).join("")}</div>
+    ${rows.length > keep ? `<div class="note" style="padding:0 16px 12px">${rows.length - keep} more organisation${rows.length-keep===1?"":"s"} in the CSV download.</div>` : ""}`;
+}
+// One tooltip for every chart mark.
+(function(){
+  const tip = $("tip");
+  const show = el => { tip.textContent = el.dataset.tip; tip.hidden = false;
+    const r = el.getBoundingClientRect(), w = tip.offsetWidth;
+    tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width/2 - w/2)) + "px";
+    tip.style.top = (r.top + scrollY - tip.offsetHeight - 8) + "px"; };
+  const hide = () => { tip.hidden = true; };
+  document.addEventListener("pointerover", e => { const el = e.target.closest("[data-tip]"); el ? show(el) : hide(); });
+  document.addEventListener("focusin", e => { const el = e.target.closest("[data-tip]"); el ? show(el) : hide(); });
+  document.addEventListener("scroll", hide, {passive:true});
+})();
+
 // ---------- Pagination for long lists ----------
 const PAGE = {}, PAGE_DRAW = {};
 function paged(id, items, size, render, noun, empty){
@@ -708,16 +801,18 @@ function renderOrgInsights(all){
     [regionCounts[0] ? regionCounts[0][0] : "None yet", "busiest region"],
   ].map(([b,s])=>`<div class="stat"><b style="font-size:${String(b).length>9?"1.25rem":"1.75rem"}">${esc(b)}</b><span>${s}</span></div>`).join("");
 
-  $("topOrgs").innerHTML = bars(count(withOrg, r=>{ const o=orgOf(r); return `${o.name} · ${o.state}`; }), "", "No checks with an organisation yet.");
-  $("byRegion").innerHTML = bars(regionCounts, "", "No checks with an organisation yet.");
-  $("byState").innerHTML = bars(count(withOrg, r=>orgOf(r).state), "", "No checks with an organisation yet.");
-  $("bySector").innerHTML = bars(count(withOrg, r=>orgOf(r).sector), "", "No checks with an organisation yet.");
+  const none = "No checks with an organisation yet.", n = withOrg.length;
+  hbars("topOrgs", count(withOrg, r=>orgOf(r).name), n, none, 10);
+  columns("byRegion", regionCounts, n, none);
+  hbars("byState", count(withOrg, r=>orgOf(r).state), n, none, 8);
+  hbars("bySector", count(withOrg, r=>orgOf(r).sector), n, none, 8);
 
-  // Not covered or no answer, by organisation, with the share of that organisation's checks.
+  // Not covered or no answer, by organisation, against all that organisation's checks.
   const tot = new Map(count(withOrg, r=>r.org));
   const walls = count(withOrg.filter(r=>r.status==="no"||r.status==="unk"), r=>r.org)
-    .map(([id,n])=>[`${orgOf({org:id}).name}: ${n} of ${tot.get(id)} checks (${Math.round(n/tot.get(id)*100)}%)`, n]);
-  $("orgWalls").innerHTML = bars(walls, "pa", "No organisation has hit a not-covered or unanswered check yet.");
+    .map(([id,k])=>({label: orgOf({org:id}).name, short:k, total: tot.get(id)}))
+    .sort((x,y)=>y.short-x.short || y.short/y.total-x.short/x.total);
+  stackbars("orgWalls", walls, "No organisation has hit a not-covered or unanswered check yet.");
 
   // Policies ending soon, with what their staff have been checking.
   const today = new Date(); today.setHours(0,0,0,0);
