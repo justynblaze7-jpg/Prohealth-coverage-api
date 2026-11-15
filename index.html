@@ -127,13 +127,20 @@ button{font:inherit;cursor:pointer;color:inherit}
 button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--tint);outline-offset:2px}
 
 /* Organisation picker */
-.orgbox .ic{color:var(--label-2);width:18px;height:18px}
-.clearbtn{border:0;background:var(--fill);color:var(--label-2);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:none;padding:0}
-.clearbtn .ic{width:14px;height:14px}
-.orglist{max-height:320px;overflow-y:auto;overscroll-behavior:contain}
+.orgrow{width:100%;border:0;background:transparent;font:inherit;color:inherit;text-align:left;cursor:pointer;font-size:17px}
+.orgrow .val{color:var(--tint);display:flex;align-items:center;justify-content:flex-end;gap:2px;min-width:0}
+.orgrow #orgName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.orgrow:focus-visible{outline:none;background:var(--fill-2)}
+.orgrow[aria-expanded="true"]{background:var(--fill-2)}
+.orgpanel{padding:10px 12px 8px;border-top:.5px solid var(--sep);display:flex;flex-direction:column;gap:6px}
+.orgpanel .search{flex:none;box-shadow:none;border:0;background:var(--fill);height:44px;border-radius:10px}
+.orgpanel .search:focus-within{box-shadow:0 0 0 2px var(--tint)}
+.orgpanel .suggest{box-shadow:none;background:transparent;border-radius:0}
+.orglist{max-height:300px;overflow-y:auto;overscroll-behavior:contain}
+.orglist button{width:100%}
 .orglist button[aria-selected="true"]{background:var(--fill)}
+.orglist button.current{color:var(--tint);font-weight:600}
 .orglist .none{padding:12px 16px;color:var(--label-2);font-size:.9375rem}
-.orgbox.picked input{font-weight:600}
 /* Chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--edge);background:var(--card);box-shadow:0 1px 2px rgba(16,24,40,.06);color:var(--label);font-size:.875rem;font-weight:500}
@@ -282,14 +289,16 @@ footer{font-size:.75rem;line-height:1.5;color:var(--label-2);display:flex;flex-d
           <span class="val"><span id="planName"></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span>
           <select id="plan" aria-label="Your plan"></select>
         </div>
+        <button type="button" class="row orgrow" id="orgRow" aria-expanded="false" aria-controls="orgPanel" aria-describedby="orghint">
+          <span class="key">Your organisation</span>
+          <span class="val"><span id="orgName">Select</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></span>
+        </button>
+        <div class="orgpanel" id="orgPanel" hidden>
+          <div class="search orgbox"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="org" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="orgList" aria-label="Search organisations" placeholder="Search your company or employer" autocomplete="off" spellcheck="false"></div>
+          <div class="suggest orglist" id="orgList" role="listbox" aria-label="Organisations"></div>
+        </div>
       </div>
-    </div>
-
-    <div class="group" id="orgGroup">
-      <label class="fieldlabel" for="org" style="padding-left:14px">Your organisation</label>
-      <div class="search orgbox"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg><input type="text" id="org" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="orgList" aria-describedby="orghint" placeholder="Search your company or employer" autocomplete="off" spellcheck="false"><button type="button" class="clearbtn" id="orgClear" aria-label="Clear organisation" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
-      <span id="orghint" class="gfoot">Optional. The company or group your ProHealth plan comes through.</span>
-      <div class="suggest orglist" id="orgList" role="listbox" aria-label="Organisations" hidden></div>
+      <span id="orghint" class="gfoot">Your organisation is optional: the company or group your ProHealth plan comes through.</span>
     </div>
 
     <form class="group" id="searchForm" autocomplete="off">
@@ -507,10 +516,10 @@ function show(s, typed, log, method="search"){
 }
 
 // ---------- Organisation picker ----------
-// Searchable list of ProHealth's corporate groups (orgs.json). Only the CBA ID is sent;
-// the server looks up the name, state, region and sector itself.
+// A row like "Your plan": tap it to open a searchable list of ProHealth's corporate groups
+// (orgs.json). Only the CBA ID is sent; the server looks up name, state, region and sector.
 const ORG_BY_ID = new Map(ORGS.map(o=>[o.id,o]));
-let selectedOrg = null, orgMatches = [], orgActive = -1;
+let selectedOrg = null, orgActive = -1;
 const orgWords = s => s.toLowerCase().replace(/[^a-z0-9& ]+/g," ").split(/\s+/).filter(Boolean);
 function findOrgs(q){
   const w = orgWords(q);
@@ -520,46 +529,37 @@ function findOrgs(q){
       return {o, sc: sc + (n.startsWith(" "+w[0])?3:0)}; })
     .filter(Boolean).sort((a,b)=>b.sc-a.sc||a.o.name.localeCompare(b.o.name)).map(x=>x.o);
 }
-function orgOptionHtml(o,i){
-  const where = o.state!=="Not stated" ? `${esc(o.state)} · ${esc(o.sector)}` : esc(o.sector);
-  return `<button type="button" role="option" id="orgopt-${i}" data-org="${o.id}" aria-selected="${i===orgActive}">${esc(o.name)}<small>${where}</small></button>`;
+const NOT_LISTED = `<button type="button" role="option" data-org="0">My organisation isn't listed<small>Check coverage without picking one</small></button>`;
+function renderOrgList(){
+  const q = $("org").value, m = findOrgs(q);
+  orgActive = -1;
+  const opt = (o,i) => `<button type="button" role="option" id="orgopt-${i}" data-org="${o.id}" aria-selected="false"${selectedOrg&&selectedOrg.id===o.id?' class="current"':''}>${esc(o.name)}<small>${o.state!=="Not stated"?`${esc(o.state)} · `:""}${esc(o.sector)}</small></button>`;
+  $("orgList").innerHTML = (m.length ? m.slice(0,80).map(opt).join("") : `<div class="none">No organisation matches "${esc(q)}". Check the spelling, or pick "isn't listed".</div>`)
+    + (selectedOrg && !q ? `<button type="button" role="option" data-org="-1">Clear my organisation<small>Go back to no organisation</small></button>` : "") + NOT_LISTED;
 }
-function openOrgList(){
-  orgMatches = findOrgs(selectedOrg ? "" : $("org").value);
-  const list = $("orgList");
-  list.innerHTML = orgMatches.length
-    ? orgMatches.slice(0,60).map(orgOptionHtml).join("") + `<button type="button" role="option" data-org="0">My organisation isn't listed<small>Check coverage without picking one</small></button>`
-    : `<div class="none">No organisation matches "${esc($("org").value)}". Check the spelling, or leave this blank.</div><button type="button" role="option" data-org="0">My organisation isn't listed<small>Check coverage without picking one</small></button>`;
-  list.hidden = false; $("org").setAttribute("aria-expanded","true");
-}
-function closeOrgList(){ $("orgList").hidden = true; $("org").setAttribute("aria-expanded","false"); $("org").removeAttribute("aria-activedescendant"); orgActive=-1; }
+function openOrg(){ $("orgPanel").hidden = false; $("orgRow").setAttribute("aria-expanded","true"); $("org").value = ""; renderOrgList(); $("org").focus(); }
+function closeOrg(focusRow){ $("orgPanel").hidden = true; $("orgRow").setAttribute("aria-expanded","false"); if(focusRow) $("orgRow").focus(); }
 function setOrg(o, remember=true){
-  selectedOrg = o && o.id ? o : null;
-  $("org").value = selectedOrg ? selectedOrg.name : (o && o.id===0 ? "Not listed" : "");
-  document.querySelector(".orgbox").classList.toggle("picked", !!selectedOrg);
-  $("orgClear").hidden = !$("org").value;
-  if(remember){ try{ localStorage.setItem("prohealth-org", selectedOrg ? String(selectedOrg.id) : ""); }catch(e){} }
-  closeOrgList();
+  selectedOrg = o && o.id > 0 ? o : null;
+  $("orgName").textContent = selectedOrg ? selectedOrg.name : (o && o.id===0 ? "Not listed" : "Select");
+  if(remember){ try{ localStorage.setItem("prohealth-org", selectedOrg ? String(selectedOrg.id) : (o && o.id===0 ? "0" : "")); }catch(e){} }
 }
-$("org").addEventListener("focus", ()=>{ if(selectedOrg || $("org").value==="Not listed"){ $("org").select(); } openOrgList(); });
-$("org").addEventListener("input", ()=>{ selectedOrg=null; document.querySelector(".orgbox").classList.remove("picked"); $("orgClear").hidden=!$("org").value; orgActive=-1; openOrgList(); });
+$("orgRow").addEventListener("click", ()=> $("orgPanel").hidden ? openOrg() : closeOrg(false));
+$("org").addEventListener("input", renderOrgList);
 $("org").addEventListener("keydown", e=>{
   const opts=[...$("orgList").querySelectorAll("button[data-org]")];
   if(e.key==="ArrowDown"||e.key==="ArrowUp"){
-    e.preventDefault(); if($("orgList").hidden) openOrgList();
-    const all=[...$("orgList").querySelectorAll("button[data-org]")]; if(!all.length) return;
-    orgActive = e.key==="ArrowDown" ? Math.min(all.length-1, orgActive+1) : Math.max(0, orgActive-1);
-    all.forEach((b,i)=>b.setAttribute("aria-selected", i===orgActive)); all[orgActive].scrollIntoView({block:"nearest"});
-    $("org").setAttribute("aria-activedescendant", all[orgActive].id||"");
-  } else if(e.key==="Enter"){
-    if(!$("orgList").hidden){ e.preventDefault(); const pick = opts[orgActive>=0?orgActive:0]; if(pick) pick.click(); }
-  } else if(e.key==="Escape"){ closeOrgList(); }
+    e.preventDefault(); if(!opts.length) return;
+    orgActive = e.key==="ArrowDown" ? Math.min(opts.length-1, orgActive+1) : Math.max(0, orgActive-1);
+    opts.forEach((b,i)=>b.setAttribute("aria-selected", i===orgActive)); opts[orgActive].scrollIntoView({block:"nearest"});
+    $("org").setAttribute("aria-activedescendant", opts[orgActive].id||"");
+  } else if(e.key==="Enter"){ e.preventDefault(); const pick = opts[orgActive>=0?orgActive:0]; if(pick) pick.click(); }
+  else if(e.key==="Escape"){ closeOrg(true); }
 });
-$("orgList").addEventListener("mousedown", e=>e.preventDefault()); // keep focus in the box while picking
-$("orgList").addEventListener("click", e=>{ const b=e.target.closest("button[data-org]"); if(!b) return; const id=+b.dataset.org; setOrg(id ? ORG_BY_ID.get(id) : {id:0}); });
-$("org").addEventListener("blur", ()=>{ setTimeout(()=>{ if(document.activeElement!==$("org")){ closeOrgList(); if(!selectedOrg && $("org").value!=="Not listed"){ const m=findOrgs($("org").value); if($("org").value.trim() && m.length===1) setOrg(m[0]); } } },120); });
-$("orgClear").addEventListener("click", ()=>{ setOrg(null); $("org").focus(); });
-try{ const saved = +localStorage.getItem("prohealth-org"); if(saved && ORG_BY_ID.has(saved)) setOrg(ORG_BY_ID.get(saved), false); }catch(e){}
+$("orgList").addEventListener("click", e=>{ const b=e.target.closest("button[data-org]"); if(!b) return;
+  const id=+b.dataset.org; setOrg(id>0 ? ORG_BY_ID.get(id) : id===0 ? {id:0} : null); closeOrg(true); });
+document.addEventListener("click", e=>{ if(!$("orgPanel").hidden && !e.target.closest("#orgPanel,#orgRow")) closeOrg(false); });
+try{ const saved = localStorage.getItem("prohealth-org"); if(saved==="0") setOrg({id:0}, false); else if(ORG_BY_ID.has(+saved)) setOrg(ORG_BY_ID.get(+saved), false); }catch(e){}
 const orgFields = () => selectedOrg ? {org:selectedOrg.id, org_name:selectedOrg.name, org_state:selectedOrg.state, org_region:selectedOrg.region, org_sector:selectedOrg.sector} : {org:null};
 
 // ---------- Logging ----------
@@ -882,7 +882,6 @@ function route(){
 addEventListener("hashchange", route);
 addEventListener("scroll", ()=>$("navbar").classList.toggle("scrolled", scrollY>4), {passive:true});
 route();
-const ex = CHIPS.find(s=>/Scaling/.test(s.name)) || SERVICES[0]; $("q").value = chipLabel(ex); show(ex, ex.name, false);
 updateNet(); flush();
 });
 </script>
