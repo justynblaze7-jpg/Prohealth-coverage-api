@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { scrub, parseCheck, parseFeedback, deviceFrom } from "../src/validate.js";
+import { scrub, parseCheck, parseFeedback, deviceFrom } from "../lib/validate.js";
 
 test("scrub removes phone numbers, ids and emails", () => {
   assert.equal(scrub("call 0803 123 4567"), "call [number]");

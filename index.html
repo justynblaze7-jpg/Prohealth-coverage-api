@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Can I Use My Plan? | ProHealth HMO</title>
+<!-- The API runs on this same site (/api/...). Only set an address here if the API is ever hosted elsewhere. -->
+<meta name="api-base" content="">
+<meta name="description" content="Check what your ProHealth HMO plan covers before you visit the hospital.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+<style>
+/* Layout: single narrow column, enrollee checker first; staff insights as a second hash view with tabular summaries. */
+:root{
+  --bg:#f3f6f5; --surface:#ffffff; --ink:#13232a; --muted:#5a6b70; --line:#d9e2e0;
+  --accent:#0f6b5c; --accent-ink:#ffffff; --accent-soft:#e1f0ec;
+  --ok:#1d7a46; --ok-soft:#e3f4ea; --pa:#9a5b00; --pa-soft:#fdf1dc;
+  --no:#b3261e; --no-soft:#fbe7e5; --unk:#4b5563; --unk-soft:#eceff1;
+  --display:"Plus Jakarta Sans",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1517; --surface:#162125; --ink:#e6eeec; --muted:#9aaeb0; --line:#26363a;
+  --accent:#4fc2a8; --accent-ink:#06201a; --accent-soft:#16332d;
+  --ok:#5fd18f; --ok-soft:#14301f; --pa:#f0b45c; --pa-soft:#33260f;
+  --no:#ff8a80; --no-soft:#3a1715; --unk:#b6c0c6; --unk-soft:#232d31; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1517; --surface:#162125; --ink:#e6eeec; --muted:#9aaeb0; --line:#26363a;
+  --accent:#4fc2a8; --accent-ink:#06201a; --accent-soft:#16332d;
+  --ok:#5fd18f; --ok-soft:#14301f; --pa:#f0b45c; --pa-soft:#33260f;
+  --no:#ff8a80; --no-soft:#3a1715; --unk:#b6c0c6; --unk-soft:#232d31; color-scheme:dark}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:680px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:1.65rem;font-weight:800}
+h2{font-size:1.15rem;font-weight:700}
+h3{font-size:.95rem;font-weight:700}
+p{margin:0}
+.muted{color:var(--muted)}
+.eyebrow{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--accent)}
+.demo-banner{background:var(--pa-soft);color:var(--ink);border:1px dashed var(--pa);border-radius:10px;padding:8px 12px;font-size:.82rem}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs a{padding:7px 14px;border-radius:999px;text-decoration:none;color:var(--muted);font-weight:600;font-size:.88rem;border:1px solid var(--line);background:var(--surface)}
+.tabs a[aria-current="page"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+label{font-weight:600;font-size:.88rem}
+select,input[type="search"],input[type="password"]{width:100%;box-sizing:border-box;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+select:focus-visible,input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.field{display:flex;flex-direction:column;gap:6px}
+.searchrow{display:flex;gap:8px}
+.searchrow input{flex:1;min-width:0}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 14px;font-weight:600}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.82rem;padding:6px 11px;border-radius:999px;font-weight:500;background:var(--accent-soft);border-color:transparent;color:var(--ink)}
+.suggest{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.suggest button small{display:block;color:var(--muted);font-size:.75rem;font-weight:400}
+.suggest button{border:0;border-radius:0;text-align:left;font-weight:500;border-bottom:1px solid var(--line)}
+.suggest button:last-child{border-bottom:0}
+.result{border-radius:14px;border:1px solid var(--line);background:var(--surface);overflow:hidden}
+.verdict{padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.verdict.ok{background:var(--ok-soft)} .verdict.pa,.verdict.lim{background:var(--pa-soft)} .verdict.gap{background:var(--unk-soft)} .verdict.no{background:var(--no-soft)} .verdict.unk{background:var(--unk-soft)}
+.pill{align-self:flex-start;font-size:.75rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 10px;border-radius:999px;color:var(--surface)}
+.pill.ok{background:var(--ok)} .pill.pa,.pill.lim{background:var(--pa)} .pill.gap{background:var(--unk)} .pill.no{background:var(--no)} .pill.unk{background:var(--unk)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--line)}
+.fact{background:var(--surface);padding:12px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.fact dt{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.fact dd{margin:0;font-weight:500}
+.desk{padding:16px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.desk ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.desk .say{background:var(--bg);border-left:3px solid var(--accent);padding:10px 12px;border-radius:6px;font-style:italic}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.note{font-size:.8rem;color:var(--muted)}
+.emerg{border:1px solid var(--no);background:var(--no-soft);border-radius:10px;padding:10px 12px;font-size:.86rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.8rem;color:var(--muted)}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:.88rem}
+.bar .track{grid-column:1/-1;height:8px;border-radius:99px;background:var(--bg);overflow:hidden}
+.bar .fill{height:100%;background:var(--accent);border-radius:99px}
+.bar .fill.pa{background:var(--pa)} .bar .fill.unk{background:var(--unk)}
+.bar .n{font-variant-numeric:tabular-nums;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.84rem}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.q{white-space:normal;min-width:160px}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.empty{padding:14px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);font-size:.88rem}
+.tag{white-space:nowrap;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:99px}
+.tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.pa,.tag.lim{background:var(--pa-soft);color:var(--pa)} .tag.gap{background:var(--unk-soft);color:var(--unk)} .tag.no{background:var(--no-soft);color:var(--no)} .tag.unk{background:var(--unk-soft);color:var(--unk)}
+footer{font-size:.78rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.result{animation:rise .2s ease-out}@keyframes rise{from{transform:translateY(4px)}to{transform:none}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="demo-banner">Based on ProHealth's 2026 corporate health plan schedule. Pre-authorisation rules and hospital choice still need confirming with ProHealth.</div>
+
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <span class="eyebrow">ProHealth HMO · Enrollee self-service</span>
+    <h1>Can I use my plan for this?</h1>
+    <p class="muted">Pick your plan, tell us what you need, and get a clear answer before you get to the hospital.</p>
+  </header>
+
+  <nav class="tabs" aria-label="Views">
+    <a href="#check" id="tab-check">Check coverage</a>
+    <a href="#insights" id="tab-insights">Staff insights</a>
+  </nav>
+
+  <section id="view-check" style="display:flex;flex-direction:column;gap:18px">
+    <div class="panel">
+      <div class="field">
+        <label for="plan">Your plan</label>
+        <select id="plan"></select>
+      </div>
+      <form class="field" id="searchForm" autocomplete="off">
+        <label for="q">What do you need?</label>
+        <div class="searchrow">
+          <input type="search" id="q" placeholder="e.g. scaling, antenatal, MRI, glasses" aria-describedby="qhint">
+          <button class="primary" type="submit">Check</button>
+        </div>
+        <span id="qhint" class="note">Type a service or tap a common one below. Don't enter your name or member number.</span>
+        <div class="suggest" id="suggest" hidden></div>
+      </form>
+      <div class="chips" id="chips" aria-label="Common services"></div>
+    </div>
+
+    <div id="result" aria-live="polite"></div>
+
+    <div class="emerg"><strong>Emergency?</strong> Go to the nearest hospital first. Emergency stabilisation is covered on every plan, for 24 to 96 hours depending on your plan.</div>
+  </section>
+
+  <section id="view-insights" hidden style="display:flex;flex-direction:column;gap:18px">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2>What enrollees are asking</h2>
+      <p class="muted" id="sourceNote">Every check is logged anonymously: the words typed, the plan and the answer given. No names or member numbers.</p>
+    </div>
+    <form class="panel" id="keyForm" hidden autocomplete="off">
+      <div class="field"><label for="staffKey">Staff key</label>
+      <div class="searchrow"><input type="password" id="staffKey" placeholder="Ask your admin for the key"><button class="primary" type="submit">Open insights</button></div>
+      <span class="note" id="keyMsg"></span></div>
+    </form>
+    <div class="panel" id="staffTools" hidden>
+      <div class="row">
+        <label for="days">Period</label>
+        <select id="days" style="width:auto"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="366">Last 12 months</option></select>
+        <label for="chan">Who</label>
+        <select id="chan" style="width:auto"><option value="">Everyone</option><option value="enrollee">Enrollees</option><option value="agent">Call centre agents</option></select>
+      </div>
+      <div class="row"><button type="button" id="csvBtn">Download CSV</button><button type="button" id="logoutBtn">Sign out</button><span class="note" id="csvNote"></span></div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="panel"><h3>Most-checked services</h3><div class="bars" id="topServices"></div></div>
+    <div class="panel"><h3>Questions the page couldn't answer</h3><p class="note">Gaps in the plan wording or the service list. Each one is a likely call-centre call.</p><div id="unanswered"></div></div>
+    <div class="panel"><h3>Checks that hit a "not covered" answer</h3><p class="note">Services enrollees want but their plan excludes. Useful for plan design and upgrade conversations.</p><div class="bars" id="notCovered"></div></div>
+    <div class="panel"><h3>Recent checks</h3><div class="tablewrap" id="recent"></div></div>
+    <div class="row">
+      <button type="button" id="sampleBtn">Load sample activity for a presentation</button>
+      <span class="note">Adds clearly marked sample checks to this screen only. Nothing is saved.</span>
+    </div>
+  </section>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+fetch("/plans.json").then(r=>r.json()).then(DATA=>{
+// ---------- Backend config ----------
+const API_BASE = (document.querySelector('meta[name="api-base"]')?.content || "").replace(/\/$/, "");
+const params = new URLSearchParams(location.search);
+// Links can say who is using the page and where they came from:
+//   ?ch=agent for call centre agents, ?src=qr / app / whatsapp / hr / webinar for enrollees
+const CHANNEL = ["enrollee","agent","staff","test"].includes(params.get("ch")) ? params.get("ch") : "enrollee";
+const SOURCE = (params.get("src") || "direct").toLowerCase().replace(/[^a-z0-9_-]/g,"").slice(0,24) || "direct";
+function sessionId(){
+  try{ let id=sessionStorage.getItem("ph-session"); if(!id){ id=crypto.randomUUID(); sessionStorage.setItem("ph-session",id); } return id; }
+  catch(e){ return (window.__phSession ||= (crypto.randomUUID ? crypto.randomUUID() : null)); }
+}
+const PLANS = DATA.plans.map(n=>({id:n.toLowerCase().replace(/\s+/g,"-"), name:n}));
+const SERVICES = DATA.services;
+const STATUS_TEXT = {ok:"Covered", lim:"Covered, with a limit", no:"Not covered", gap:"Not stated in the schedule", unk:"We couldn't find this"};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const planName = id => (PLANS.find(p=>p.id===id)||PLANS[0]).name;
+const tierOf = id => Math.max(0, PLANS.findIndex(p=>p.id===id));
+const byId = id => SERVICES.find(s=>s.id===id);
+function forPlan(s, plan){ const [status, text] = s.v[tierOf(plan)]; return {status, text}; }
+
+$("foot").innerHTML = `<p>Coverage answers are a guide based on the 2026 plan schedule. The final decision rests with ProHealth.</p><p>${DATA.notes.filter(n=>!/premium/i.test(n)).map(esc).join(" · ")}</p>`;
+
+// ---------- Matching ----------
+// Filler words carry no meaning for matching: "does my plan cover an MRI" should match on "mri" only.
+const STOP = new Set("a an and any are at be by can cover covered coverage do does for get have how i if in is it me much my need of on or our plan please service still the this to under what when where which will with you your".split(" "));
+function tokens(q){ return q.toLowerCase().split(/[^a-z0-9\-/]+/).filter(w=>w.length>1 && !STOP.has(w)); }
+// Short words (2 letters, e.g. "ct") only count as whole words; longer ones may match inside words.
+// Words of 3 letters or fewer ("ct", "ent", "gym") must start a word, so "ent" doesn't match "inpatient".
+function hit(hay, w){ return w.length<=3 ? new RegExp(`(^|[^a-z0-9])${w}`).test(hay) : hay.includes(w); }
+// Questions about the plan itself (changing hospital, cards, premiums) aren't benefits: send them to ProHealth.
+const ADMIN = new Set("change switch transfer register registration card id login password app premium price cost pay payment refund renew renewal dependant dependent add remove wife husband spouse".split(" "));
+function score(s, q){
+  const words = tokens(q);
+  if(!words.length) return 0;
+  const name = (s.name+" "+(s.al||"")).toLowerCase(), detail = (s.detail||"").toLowerCase(), kw = ((s.kw||"")+" "+s.sec).toLowerCase();
+  let n=0, matched=0;
+  for(const w of words){
+    const wt = w.length>3?2:1;
+    if(hit(name,w)) n += 3*wt; else if(hit(detail,w)) n += 2*wt; else if(hit(kw,w)) n += wt; else continue;
+    matched++;
+  }
+  // A service matching more of the words beats one matching a single word strongly.
+  return matched ? matched*10 + n : 0;
+}
+// Every word that appears anywhere in the schedule. A real word (4+ letters) outside it, like "covid",
+// means the question is about something the schedule doesn't list, so the page says so instead of guessing.
+const VOCAB = SERVICES.map(s=>[s.name,s.al,s.detail,s.kw,s.sec].join(" ")).join(" ").toLowerCase();
+const bestMatches = q => {
+  const t = tokens(q);
+  if(t.some(w => ADMIN.has(w))) return [];
+  if(t.some(w => w.length>=4 && !/^\d+$/.test(w) && !VOCAB.includes(w))) return [];
+  return SERVICES.map(s=>({s,n:score(s,q)})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n).map(x=>x.s);
+};
+
+// ---------- Enrollee UI ----------
+$("plan").innerHTML = PLANS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
+try{ const saved = localStorage.getItem("prohealth-plan"); if(saved && PLANS.some(p=>p.id===saved)) $("plan").value = saved; }catch(e){}
+$("plan").addEventListener("change", ()=>{ try{localStorage.setItem("prohealth-plan",$("plan").value)}catch(e){} if(lastShown) show(lastShown.s, lastShown.q, false); });
+
+const CHIPS = ["Antenatal Care","Caesarian section","MRI","Scaling & Polishing","Provision of lenses","Kidney dialysis","Access to gyms"]
+  .map(t=>SERVICES.find(s=>s.name.toLowerCase().startsWith(t.toLowerCase()))).filter(Boolean);
+const chipLabel = s => s.name.replace(/\s*\(.*$/,"").replace("Caesarian section C/S","Caesarean section").replace("Access to gyms for regular exercise","Gym access");
+$("chips").innerHTML = CHIPS.map(s=>`<button type="button" class="chip" data-id="${s.id}">${esc(chipLabel(s))}</button>`).join("");
+$("chips").addEventListener("click", e=>{ const b=e.target.closest("button[data-id]"); if(!b) return; const s=byId(b.dataset.id); $("q").value=chipLabel(s); $("suggest").hidden=true; show(s, chipLabel(s), true, "chip"); });
+
+$("q").addEventListener("input", ()=>{
+  const q=$("q").value.trim(); const m = q.length>1 ? bestMatches(q).slice(0,6) : [];
+  $("suggest").innerHTML = m.map(s=>`<button type="button" data-id="${s.id}">${esc(s.name)}<small>${esc(s.sec)}</small></button>`).join("");
+  $("suggest").hidden = !m.length;
+});
+$("suggest").addEventListener("click", e=>{ const b=e.target.closest("button[data-id]"); if(!b) return; const s=byId(b.dataset.id); const typed=$("q").value.trim(); $("q").value=s.name; $("suggest").hidden=true; show(s, typed||s.name, true, "suggestion"); });
+$("searchForm").addEventListener("submit", e=>{ e.preventDefault(); const q=$("q").value.trim(); if(!q) return; $("suggest").hidden=true; show(bestMatches(q)[0]||null, q, true, "search"); });
+
+let lastShown=null;
+function show(s, typed, log, method="search"){
+  const plan=$("plan").value, pn=planName(plan); lastShown={s, q:typed};
+  if(!s){
+    $("result").innerHTML = `<div class="result"><div class="verdict unk"><span class="pill unk">${STATUS_TEXT.unk}</span>
+      <h2>No answer for "${esc(typed)}" yet</h2>
+      <p>Call ProHealth before you go, or ask the hospital to confirm with ProHealth. We've noted this question so the plan guide can be improved.</p></div>${log?feedbackBox():""}</div>`;
+    if(log) record({q:typed, service:null, status:"unk", plan, method});
+    return;
+  }
+  const r = forPlan(s, plan);
+  const lead = r.status==="ok" ? `Your ${pn} plan covers this. Show your ProHealth ID at the desk.`
+    : r.status==="lim" ? `Your ${pn} plan covers this up to the limit shown below.`
+    : r.status==="no" ? `Your ${pn} plan does not cover this. Any cost would be paid by you unless ProHealth approves otherwise.`
+    : `The plan schedule doesn't say whether ${pn} covers this. Call ProHealth before treatment.`;
+  const covered = r.status==="ok" || r.status==="lim";
+  const lim = r.text.charAt(0).toLowerCase()+r.text.slice(1);
+  const say = covered ? `I'm on the ProHealth ${pn} plan. ${s.name} is covered on my plan${r.status==="lim"?` (${lim})`:""}. Please confirm with ProHealth if a pre-authorisation code is needed before treatment.` : "";
+  const docs = ["ProHealth ID card or enrollee number"];
+  if(/referral/i.test(s.name+" "+(s.detail||"")+" "+s.sec)) docs.push("Referral letter from your primary clinic");
+  if(/maternity|family/i.test(s.sec+" "+s.secnote)) docs.push("Antenatal card, if you have one");
+  $("result").innerHTML = `<div class="result">
+    <div class="verdict ${r.status}"><span class="pill ${r.status}">${STATUS_TEXT[r.status]}</span><h2>${esc(s.name)}</h2><p>${esc(lead)}</p></div>
+    <dl class="facts" style="margin:0">
+      <div class="fact"><dt>Plan</dt><dd>${esc(pn)}</dd></div>
+      <div class="fact"><dt>On your plan</dt><dd>${esc(r.text)}</dd></div>
+      <div class="fact"><dt>Benefit section</dt><dd>${esc(s.sec)}${s.secnote?`<br><span class="note">Applies to: ${esc(s.secnote)}</span>`:""}</dd></div>
+    </dl>
+    ${s.detail?`<div class="desk"><h3>What the schedule says</h3><p class="note" style="color:var(--ink)">${esc(s.detail)}</p></div>`:""}
+    <div class="desk">
+      <h3>${esc(s.name.replace(/\s*\(.*$/,""))} on every plan</h3>
+      <div class="tablewrap"><table><tbody>${PLANS.map(p=>{const x=forPlan(s,p.id);return `<tr${p.id===plan?' style="font-weight:600"':''}><td>${esc(p.name)}${p.id===plan?' (yours)':''}</td><td><span class="tag ${x.status}">${STATUS_TEXT[x.status]}</span></td><td class="q">${esc(x.text)}</td></tr>`}).join("")}</tbody></table></div>
+    </div>
+    ${covered?`<div class="desk">
+      <h3>What to bring</h3><ol>${docs.map(d=>`<li>${esc(d)}</li>`).join("")}</ol>
+      <h3>What to say at the hospital desk</h3>
+      <p class="say" id="sayText">${esc(say)}</p>
+      <div class="row"><button type="button" id="copyBtn">Copy what to say</button><span class="note" id="copyNote">Or take a screenshot of this card.</span></div>
+    </div>`:""}${log?feedbackBox():""}</div>`;
+  if(covered) $("copyBtn").addEventListener("click", ()=>{
+    const fallback=()=>{ const rg=document.createRange(); rg.selectNodeContents($("sayText")); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(rg); $("copyNote").textContent="Text selected. Copy it from your menu."; };
+    try{ navigator.clipboard.writeText(say).then(()=>{$("copyNote").textContent="Copied."}).catch(fallback); }catch(e){ fallback(); }
+  });
+  if(log) record({q:typed, service:s.id, service_name:s.name, section:s.sec, answer:r.text, status:r.status, plan, method});
+}
+
+// ---------- Logging ----------
+// Each check is sent anonymously to the backend. The staff view reads insights with a staff key.
+let rows=[], sampleRows=[], localRows=[], lastCheck=null;
+function record(entry){
+  const row = {...entry, q: entry.q.slice(0,120), ts: Date.now()};
+  localRows = [row, ...localRows];
+  const body = {...row, plan_name: planName(row.plan), channel: CHANNEL, source: SOURCE, session: sessionId(), data_version: "2026"};
+  lastCheck = fetch(API_BASE + "/api/checks", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body), keepalive:true})
+    .then(r => r.ok ? r.json() : null).then(d => d && d.id).catch(() => null);
+}
+
+// "Was this helpful?" under each answer
+function feedbackBox(){
+  return `<div class="desk" id="fb"><div class="row"><span>Was this answer helpful?</span>
+    <button type="button" data-helpful="true">Yes</button><button type="button" data-helpful="false">No</button></div>
+    <span class="note" id="fbNote"></span></div>`;
+}
+$("result").addEventListener("click", async e => {
+  const b = e.target.closest("button[data-helpful]"); if(!b) return;
+  const helpful = b.dataset.helpful === "true";
+  $("fb").querySelectorAll("button").forEach(x => x.disabled = true);
+  $("fbNote").textContent = "Thank you for the feedback.";
+  const id = await lastCheck;
+  if(id) fetch(`${API_BASE}/api/checks/${id}/feedback`, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({helpful}), keepalive:true}).catch(()=>{});
+});
+
+function getKey(){ try{ return sessionStorage.getItem("staffKey")||""; }catch(e){ return window.__staffKey||""; } }
+function setKey(k){ try{ sessionStorage.setItem("staffKey",k); }catch(e){ window.__staffKey=k; } }
+function dropKey(){ try{ sessionStorage.removeItem("staffKey"); }catch(e){} window.__staffKey=""; }
+let summary=null;
+async function loadInsights(){
+  const key = getKey();
+  summary = null;
+  if(!key){ $("keyForm").hidden=false; $("staffTools").hidden=true; $("sourceNote").textContent="Enter the staff key to see what enrollees are asking. Until then, this shows checks made on this screen only."; rows=localRows; renderInsights(); return; }
+  $("sourceNote").textContent="Loading shared activity. The first load can take up to a minute if the service has been idle.";
+  try{
+    const qs = new URLSearchParams({days: $("days").value}); if($("chan").value) qs.set("channel", $("chan").value);
+    const res = await fetch(`${API_BASE}/api/insights?${qs}`, {headers:{"X-Staff-Key":key}});
+    if(res.status===401){ dropKey(); $("keyForm").hidden=false; $("staffTools").hidden=true; $("keyMsg").textContent="That key didn't work. Check it with your admin and try again."; rows=localRows; renderInsights(); return; }
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    if(data.configured===false){ rows=localRows; $("keyForm").hidden=true; $("staffTools").hidden=true; $("sourceNote").textContent="The database isn't connected yet, so this shows checks made on this screen only. Connect Neon in Vercel (Storage tab) and redeploy."; renderInsights(); return; }
+    rows = data.rows||[]; summary = data.summary||null; $("keyForm").hidden=true; $("staffTools").hidden=false;
+    $("sourceNote").textContent = `Shared activity for the last ${data.period_days} days${data.channel!=="all"?`, ${data.channel} checks only`:""}. Every check is logged anonymously: the words typed, the plan and the answer given. No names or member numbers.`;
+  }catch(e){ rows=localRows; $("sourceNote").textContent="Couldn't reach the insights service. Showing checks made on this screen only."; }
+  renderInsights();
+}
+$("keyForm").addEventListener("submit", e=>{ e.preventDefault(); const k=$("staffKey").value.trim(); if(!k) return; setKey(k); $("keyMsg").textContent=""; loadInsights(); });
+$("days").addEventListener("change", loadInsights);
+$("chan").addEventListener("change", loadInsights);
+$("csvBtn").addEventListener("click", async ()=>{
+  $("csvNote").textContent="Preparing the file…";
+  try{
+    const qs = new URLSearchParams({days: $("days").value}); if($("chan").value) qs.set("channel", $("chan").value);
+    const res = await fetch(`${API_BASE}/api/export.csv?${qs}`, {headers:{"X-Staff-Key":getKey()}});
+    if(!res.ok) throw new Error();
+    const url = URL.createObjectURL(await res.blob());
+    const a = document.createElement("a"); a.href=url; a.download=`coverage-checks-last-${$("days").value}-days.csv`; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 5000);
+    $("csvNote").textContent="Downloaded.";
+  }catch(e){ $("csvNote").textContent="Couldn't download the file. Check the staff key and try again."; }
+});
+$("logoutBtn").addEventListener("click", ()=>{ dropKey(); $("staffKey").value=""; loadInsights(); });
+
+// ---------- Insights ----------
+function count(list, key){ const m=new Map(); for(const r of list){ const k=key(r); if(k==null) continue; m.set(k,(m.get(k)||0)+1); } return [...m.entries()].sort((a,b)=>b[1]-a[1]); }
+function bars(entries, cls, empty){
+  if(!entries.length) return `<div class="empty">${empty}</div>`;
+  const max = entries[0][1];
+  return entries.slice(0,8).map(([k,n])=>`<div class="bar"><span>${esc(k)}</span><span class="n">${n}</span><div class="track"><div class="fill ${cls}" style="width:${Math.max(4,Math.round(n/max*100))}%"></div></div></div>`).join("");
+}
+const nameOf = id => (byId(id)||{}).name || "Unknown service";
+function renderInsights(){
+  const all = [...sampleRows, ...rows];
+  const total = all.length, unk = all.filter(r=>r.status==="unk").length, no = all.filter(r=>r.status==="no").length;
+  const pct = n => total ? Math.round(n/total*100)+"%" : "0%";
+  const helpful = summary && summary.helpful_rate!=null && !sampleRows.length ? [summary.helpful_rate+"%","found the answer helpful"] : null;
+  const visitors = summary && !sampleRows.length ? [summary.visitors,"unique visitors"] : null;
+  $("stats").innerHTML = [[total,"checks logged"],[pct(total-unk),"answered by the page"],[unk,"couldn't be answered"],[no,"got a not-covered answer"], visitors, helpful].filter(Boolean)
+    .map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+  $("topServices").innerHTML = bars(count(all, r=>r.service?nameOf(r.service):null), "", "No checks yet. Try a few on the Check coverage tab, or load sample activity below.");
+  $("notCovered").innerHTML = bars(count(all.filter(r=>r.status==="no"), r=>`${nameOf(r.service)} (${planName(r.plan)})`), "pa", "No not-covered answers yet.");
+  const un = count(all.filter(r=>r.status==="unk"), r=>r.q.toLowerCase());
+  $("unanswered").innerHTML = un.length ? `<div class="bars">${bars(un,"unk","")}</div>` : `<div class="empty">Nothing unanswered yet. Questions the page can't match will appear here.</div>`;
+  const recent = all.slice().sort((a,b)=>b.ts-a.ts).slice(0,12);
+  $("recent").innerHTML = recent.length ? `<table><thead><tr><th>When</th><th>Typed</th><th>Plan</th><th>Answer</th></tr></thead><tbody>${
+    recent.map(r=>`<tr><td>${new Date(r.ts).toLocaleString([], {day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}${r.sample?' <span class="tag gap">sample</span>':''}</td><td class="q">${esc(r.q)}</td><td>${esc(planName(r.plan))}</td><td><span class="tag ${r.status}">${STATUS_TEXT[r.status]}</span></td></tr>`).join("")
+  }</tbody></table>` : `<div class="empty">No checks yet.</div>`;
+}
+
+$("sampleBtn").addEventListener("click", ()=>{
+  if(sampleRows.length){ sampleRows=[]; $("sampleBtn").textContent="Load sample activity for a presentation"; renderInsights(); return; }
+  const qs = [["antenatal",6],["caesarean",4],["mri",5],["scaling",4],["glasses",4],["dialysis",3],["gym",2],["root canal",3],["ct scan",2],["hypertension",2],["mammogram",2],["does my plan cover ivf",2],["can i change my hospital",2],["is my wife covered",2],["covid test",1]];
+  const now=Date.now(); let i=0;
+  for(const [q,n] of qs) for(let k=0;k<n;k++){
+    const pl=PLANS[(i*7)%5].id; const s=bestMatches(q)[0];
+    const st = s ? forPlan(s,pl).status : "unk";
+    sampleRows.push({q, service:s?s.id:null, status: /ivf|hospital|wife|covid/.test(q)?"unk":st, plan:pl, ts:now-(i++)*3.7e6, sample:true});
+  }
+  sampleRows.forEach(r=>{ if(r.status==="unk") r.service=null; });
+  $("sampleBtn").textContent="Remove sample activity"; renderInsights();
+});
+
+// ---------- Routing ----------
+function route(){
+  const v = location.hash==="#insights" ? "insights" : "check";
+  $("view-check").hidden = v!=="check"; $("view-insights").hidden = v!=="insights";
+  $("tab-check").removeAttribute("aria-current"); $("tab-insights").removeAttribute("aria-current");
+  $("tab-"+v).setAttribute("aria-current","page");
+  if(v==="insights") loadInsights();
+}
+addEventListener("hashchange", route);
+route();
+const ex = CHIPS.find(s=>/Scaling/.test(s.name)) || SERVICES[0]; $("q").value = chipLabel(ex); show(ex, ex.name, false);
+});
+</script>
+
+</body>
+</html>
