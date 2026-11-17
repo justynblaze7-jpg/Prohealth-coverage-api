@@ -532,24 +532,29 @@ async function flush(){
     }
   }catch(e){ /* no connection: keep everything for the next try */ }
   flushing = false;
+  if(readStore(OUTBOX_KEY, []).length) netTrouble = true; // a send failed: tell the user it's saved
   updateNet();
   clearTimeout(retryTimer);
   if(readStore(OUTBOX_KEY, []).length) retryTimer = setTimeout(flush, 30000);
 }
 
+// The notice only appears when something actually went wrong: the device is offline,
+// or a send failed. A normal online check never shows it.
+let netTrouble = false;
 function updateNet(){
   const n = readStore(OUTBOX_KEY, []).filter(x=>x.kind==="check").length, el = $("netNote");
   if(navigator.onLine === false){
+    netTrouble = true;
     el.className = "netnote"; el.hidden = false;
     el.innerHTML = `${ic("wifi-off")}<span><strong>You're offline.</strong> You can still check your plan. ${n ? `${n} check${n===1?" is":"s are"} saved on this phone and will be sent` : "Your checks will be saved and sent"} when you're back online.</span>`;
-  } else if(n){
+  } else if(n && netTrouble){
     el.className = "netnote"; el.hidden = false;
     el.innerHTML = `${ic("refresh")}<span>Sending ${n} saved check${n===1?"":"s"}…</span>`;
-  } else if(!el.hidden && el.dataset.wasPending === "1"){
-    el.className = "netnote ok"; el.innerHTML = `${ic("check-circle")}<span>Back online. Saved checks have been sent.</span>`;
+  } else if(!n && netTrouble){
+    netTrouble = false;
+    el.className = "netnote ok"; el.hidden = false; el.innerHTML = `${ic("check-circle")}<span>Back online. Saved checks have been sent.</span>`;
     clearTimeout(updateNet.t); updateNet.t = setTimeout(()=>{ el.hidden = true; }, 4000);
-  } else if(el.className.indexOf("ok") < 0){ el.hidden = true; }
-  el.dataset.wasPending = (navigator.onLine === false || n) ? "1" : "0";
+  } else if(!netTrouble && el.className.indexOf("ok") < 0){ el.hidden = true; }
 }
 addEventListener("online", flush);
 addEventListener("offline", updateNet);
