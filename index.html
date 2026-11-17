@@ -174,7 +174,8 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,su
 .deskmsg strong{font-size:1.0625rem}
 .bringrow .ic{color:var(--tint)}
 .fb{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.fb span:first-child{flex:1;min-width:140px}
+.fb span:first-child{flex:1 1 180px;min-width:0}
+.fb .fbbtns{display:flex;gap:8px;flex:none}
 .fb button[aria-pressed="true"]{background:var(--tint);color:var(--on-tint)}
 .fb button:disabled{cursor:default}
 
@@ -565,7 +566,7 @@ function record(entry){
 // "Was this helpful?" under each answer
 function feedbackBox(){
   return `<div class="group" id="fb"><div class="card"><div class="row fb"><span>Was this answer helpful?</span>
-    <button type="button" class="btn gray" data-helpful="true">${ic("thumbs-up")}Yes</button><button type="button" class="btn gray" data-helpful="false">${ic("thumbs-down")}No</button></div></div>
+    <span class="fbbtns"><button type="button" class="btn gray" data-helpful="true">${ic("thumbs-up")}Yes</button><button type="button" class="btn gray" data-helpful="false">${ic("thumbs-down")}No</button></span></div></div>
     <span class="gfoot" id="fbNote"></span></div>`;
 }
 $("result").addEventListener("click", e => {
